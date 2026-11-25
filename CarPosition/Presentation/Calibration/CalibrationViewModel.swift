@@ -97,7 +97,8 @@ final class CalibrationViewModel {
             return nil
         }
         let task = Task { [weak self] in
-            await self?.runCountdown()
+            guard let self else { return }
+            await self.runCountdown()
         }
         countdownTask = task
         return task
