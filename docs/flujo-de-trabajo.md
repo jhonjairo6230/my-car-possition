@@ -10,24 +10,24 @@ Decisión registrada en [ADR 0002](adr/0002-git-flow.md), adoptada de DrawPad.
 | `release/<x.y.z>` | `develop` | `main` | Preparar una versión: subir el número. |
 | `backport/<x.y.z>` | `main` (tras la release) | `develop` | Llevar a `develop` lo que cambió en la release. |
 | `hotfix/<x.y.z>` | `main` | `main` | Arreglo urgente. Después, `backport/<x.y.z>`. |
-| `claude/<…>` | — | `develop` (por PR) | Solo sesiones de Claude Code en la nube (excepción del ADR 0002). |
 
 Reglas:
 
 - **Nunca** commits directos en `main` ni en `develop`: siempre por pull
   request, con el workflow **Compilar IPA** en verde.
 - **Nunca** un pull request de `develop` a `main`: se pasa por `release/`.
+- Solo esos prefijos, en minúsculas y con guiones (nada de `claude/…`).
 
 ```mermaid
 gitGraph
     commit id: "Initial commit"
     branch develop
     checkout develop
-    branch claude/estructura-inicial
-    checkout claude/estructura-inicial
+    branch feature/app-mi-posicion
+    checkout feature/app-mi-posicion
     commit id: "app + CI + docs"
     checkout develop
-    merge claude/estructura-inicial
+    merge feature/app-mi-posicion
     branch release/0.1.0
     checkout release/0.1.0
     commit id: "version 0.1.0"

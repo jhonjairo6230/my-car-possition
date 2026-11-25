@@ -11,7 +11,7 @@ aplican se han **adoptado** aquí con su propio número.
 | N.º | Decisión | Origen | Estado |
 | --- | -------- | ------ | ------ |
 | [0001](0001-registrar-decisiones-con-adr.md) | Registrar las decisiones con ADR | DrawPad 0001 | Aceptada |
-| [0002](0002-git-flow.md) | Usar Git Flow como flujo de ramas | DrawPad 0002 (con excepción) | Aceptada |
+| [0002](0002-git-flow.md) | Usar Git Flow como flujo de ramas | DrawPad 0002 | Aceptada |
 | [0003](0003-clean-architecture-mvvm.md) | Clean Architecture con MVVM | DrawPad 0003 | Aceptada |
 | [0004](0004-compilar-sin-mac.md) | Compilar sin Mac: GitHub Actions, XcodeGen e IPA sin firmar | DrawPad 0004 | Aceptada |
 | [0005](0005-documentacion.md) | Documentar con Markdown + Mermaid y comentarios DocC | DrawPad 0006 | Aceptada |

@@ -11,8 +11,6 @@ on:
       - "release/**"
       - "hotfix/**"
       - "backport/**"
-      # Ramas de las sesiones de Claude Code en la nube (ver ADR 0002).
-      - "claude/**"
   pull_request:
   workflow_dispatch:
 

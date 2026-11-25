@@ -58,7 +58,5 @@ el simulador: la medición real se prueba en el auto.
 | `hotfix/<x.y.z>` | `main` | `main` | Arreglo urgente. Después, `backport/<x.y.z>`. |
 
 - **Nunca** un PR de `develop` a `main` ni commits directos en `develop` o `main`.
-- Ramas `claude/…`: solo las sesiones de Claude Code en la nube, que no
-  pueden usar otras; entran a `develop` por PR (ver ADR 0002). En local, solo
-  prefijos de Git Flow.
+- **No uses ramas `claude/…`** ni otros prefijos.
 - Versionado semántico: funcionalidad sube `y`, arreglos suben `z`.
