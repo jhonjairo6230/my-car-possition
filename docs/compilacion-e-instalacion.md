@@ -33,5 +33,6 @@ Notas:
   posiciones guardadas se conservan si instalas encima).
 - Con un Apple ID gratuito hay un límite de **3 apps** instaladas así a la
   vez; DrawPad cuenta como una.
-- En el simulador del CI no hay cámara: las pruebas de interfaz usan una
-  cámara simulada (`-uiTesting`). La medición real se prueba en el auto.
+- En el simulador del CI no hay cámaras: las pruebas de interfaz usan
+  cámaras simuladas (`-uiTesting`). La realidad aumentada y las medidas
+  reales se prueban en el auto.

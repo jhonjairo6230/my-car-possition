@@ -16,8 +16,9 @@ aplican se han **adoptado** aquí con su propio número.
 | [0004](0004-compilar-sin-mac.md) | Compilar sin Mac: GitHub Actions, XcodeGen e IPA sin firmar | DrawPad 0004 | Aceptada |
 | [0005](0005-documentacion.md) | Documentar con Markdown + Mermaid y comentarios DocC | DrawPad 0006 | Aceptada |
 | [0006](0006-swiftdata.md) | SwiftData como base de datos local | DrawPad 0007 | Aceptada |
-| [0007](0007-arkit-seguimiento-facial.md) | Medir la cabeza con el seguimiento facial de ARKit, desde el móvil fijo | Propio | Aceptada |
-| [0008](0008-comparacion-en-vivo.md) | Comparar con mediana, tolerancias fijas y veredicto en vivo | Propio | Aceptada |
+| [0007](0007-guia-ar-del-asiento.md) | Guiar el asiento con realidad aumentada (cámara trasera), tomando el umbral como referencia | Propio | Aceptada |
+| [0008](0008-camara-frontal-complemento.md) | Comprobar con la cara (cámara frontal) como complemento | Propio | Aceptada |
+| [0009](0009-comparacion-en-vivo.md) | Comparar con mediana, tolerancias fijas y veredicto en vivo | Propio | Aceptada |
 
 ADR de DrawPad que **no** aplican (son del lienzo de dibujo): 0005 PencilKit,
 0008 papel y tema, 0009 zoom, 0010 cuadernos y 0011 suavizar trazos.

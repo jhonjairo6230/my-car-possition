@@ -1,15 +1,13 @@
-# 0007. Medir la cabeza con el seguimiento facial de ARKit, desde el móvil fijo
+# 0008. Comprobar con la cara (cámara frontal) como complemento
 
 - **Estado:** Aceptada
 - **Fecha:** 2026-11-25
 
 ## Contexto
 
-Cuando otra persona usa el auto, cambia el asiento (adelante/atrás, altura,
-respaldo), el volante y los espejos. Al recuperarlo hay que volver a dejarlo
-como estaba, y "a ojo" nunca queda igual.
-
-Lo que importa no es dónde está el asiento sino **dónde queda la cabeza del
+La guía principal mide el asiento con la cámara trasera
+([ADR 0007](0007-guia-ar-del-asiento.md)). Como complemento, se quiere una
+comprobación sentado: al final lo que importa es **dónde queda la cabeza del
 conductor**: de eso dependen la visión, la distancia a los pedales y al
 volante y lo que se ve en los espejos. Hace falta medirla con precisión de
 1–2 cm, con un iPhone, sin accesorios y sin Mac
@@ -17,6 +15,9 @@ volante y lo que se ve en los espejos. Hace falta medirla con precisión de
 
 ## Decisión
 
+0. Es un **complemento opcional** de cada posición: se calibra desde la ficha
+   de la posición ("Calibrar con mi cara") y se guarda junto al asiento
+   (`DrivingProfile.head`).
 1. **Seguimiento facial de ARKit** (`ARFaceTrackingConfiguration`, cámara
    frontal). ARKit da la posición 3D de la cara en metros, ~60 veces por
    segundo, con un error de pocos milímetros a 50–80 cm.
@@ -37,13 +38,13 @@ volante y lo que se ve en los espejos. Hace falta medirla con precisión de
    cabeza, para que las pruebas de interfaz recorran el flujo completo en el
    simulador.
 7. Los espejos y el volante no se miden: cada posición tiene **notas**
-   ("Volante: 2ª muesca") que se muestran al comprobar.
+   ("Volante: 2ª muesca").
 
 ## Alternativas consideradas
 
-- **Seguimiento del mundo con la cámara trasera** (anclas en el asiento o
-  marcadores impresos): mide el asiento directamente, pero obliga a sostener
-  el móvil fuera del auto o a pegar marcadores, y no mide la cabeza.
+- **Solo la guía con la cámara trasera:** mide el asiento, pero no la
+  cabeza; un cojín más grueso o otros zapatos cambian la postura sin mover
+  el asiento.
 - **Detección de cuerpo (`ARBodyTrackingConfiguration`):** cámara trasera y
   cuerpo entero a la vista; imposible dentro de un auto.
 - **Vision (puntos de la cara en 2D) con la cámara normal:** funciona en más

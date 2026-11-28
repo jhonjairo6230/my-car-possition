@@ -7,7 +7,7 @@
 ## Contexto
 
 La parte delicada de la app no son las pantallas sino **las cuentas**: pasar
-de lo que ve ARKit a "adelanta el asiento 3 cm". Esas cuentas tienen que
+de lo que ve ARKit a "adelanta el asiento 3 cm" o "endereza el respaldo 4°". Esas cuentas tienen que
 poder probarse sin iPhone, sin cámara y sin ARKit (el simulador del CI no
 tiene ninguna de las tres cosas).
 
@@ -15,14 +15,16 @@ tiene ninguna de las tres cosas).
 
 Las mismas cuatro capas que DrawPad, con dependencias solo hacia dentro:
 
-- **Domain:** entidades (`PostureSample`, `PostureMeasurement`,
-  `DrivingProfile`, `PositionEvaluation`), errores, servicios puros
-  (`PostureGeometry`, `PositionEvaluator`), el puerto `ProfileRepository`
-  y los casos de uso. Solo `Foundation`: ni ARKit ni `simd`.
+- **Domain:** entidades (`CarFrame`, `SeatPosition`, `DrivingProfile`,
+  `PostureMeasurement`…), errores, servicios puros (`SeatEvaluator`,
+  `AimSmoother`, `PostureGeometry`, `HeadEvaluator`), el puerto
+  `ProfileRepository` y los casos de uso. Solo `Foundation`: ni ARKit ni `simd`.
 - **Data:** `SwiftDataProfileRepository`.
 - **Presentation:** SwiftUI con **MVVM** y `@Observable`. Los ViewModel
-  hablan con la cámara a través del protocolo `HeadTracker` (el equivalente
-  al `DrawingCanvas` de DrawPad).
+  hablan con las cámaras a través de los protocolos `SeatScanner` (trasera,
+  realidad aumentada) y `HeadTracker` (frontal), el equivalente al
+  `DrawingCanvas` de DrawPad. Lo que se dibuja en realidad aumentada se
+  describe con `AROverlay`, sin SceneKit.
 - **App:** `AppContainer` como *composition root*, todo `lazy`.
 
 Todo en un único target; las capas son carpetas.
@@ -37,7 +39,7 @@ Todo en un único target; las capas son carpetas.
 ## Consecuencias
 
 - La geometría, la mediana, la evaluación y los ViewModel tienen pruebas
-  unitarias con un rastreador falso (`FakeHeadTracker`).
+  unitarias con cámaras falsas (`FakeSeatScanner`, `FakeHeadTracker`).
 - Cambiar ARKit por otro sensor afecta a un solo archivo.
 - Más archivos de los que una app tan pequeña necesita: coste asumido por el
   valor didáctico.

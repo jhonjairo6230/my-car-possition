@@ -40,7 +40,7 @@ cuenta de pago, AltStore, Mac en la nube). Además:
 - Ni Mac ni pagos.
 - Sin compilador local: cada cambio se comprueba con un push.
 - **ARKit no funciona en el simulador:** las pruebas de interfaz usan una
-  cámara simulada (ver [ADR 0007](0007-arkit-seguimiento-facial.md)) y la
+  cámara simulada (ver [ADR 0007](0007-guia-ar-del-asiento.md)) y la
   medición real solo se valida en el auto.
 - La firma gratuita caduca a los 7 días y hay un límite de 3 apps por
   dispositivo (DrawPad ya ocupa una).

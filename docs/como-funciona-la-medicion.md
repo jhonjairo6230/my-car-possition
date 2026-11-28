@@ -1,81 +1,88 @@
 # Cómo funciona la medición
 
-Decisiones: [ADR 0007](adr/0007-arkit-seguimiento-facial.md) y
-[ADR 0008](adr/0008-comparacion-en-vivo.md).
+Decisiones: [ADR 0007](adr/0007-guia-ar-del-asiento.md) (asiento, cámara
+trasera), [ADR 0008](adr/0008-camara-frontal-complemento.md) (cara, cámara
+frontal) y [ADR 0009](adr/0009-comparacion-en-vivo.md) (comparación).
 
-## 1. Qué da ARKit
+## 1. La mira (`ARKitSeatScanner`, `AimSmoother`)
 
-Con `ARFaceTrackingConfiguration` y `worldAlignment = .gravity`, en cada
-fotograma ARKit da:
+En cada fotograma se lanza un **rayo** desde el centro de la pantalla contra
+las superficies que ARKit reconoce (primero los planos detectados, si no una
+estimación). El punto de choque tiembla unos milímetros, así que se usa la
+**mediana** de los últimos 10 fotogramas.
 
-- La **transformación de la cámara** (posición y ejes `x`, `y`, `z`) en un
-  "mundo" cuyo eje `y` apunta **contra la gravedad**.
-- La **transformación de la cara** (`ARFaceAnchor`), cuyo origen es el centro
-  de la cabeza.
+## 2. El sistema del auto (`CarFrame`)
 
-## 2. De ARKit a tres distancias (`PostureGeometry`)
+ARKit cambia de origen en cada sesión, así que nada se guarda en sus
+coordenadas. Con los dos puntos del umbral se construyen unos ejes **pegados
+al auto**:
 
 ```mermaid
 flowchart LR
-    C["Cámara<br/>posición + ejes"] --> V["toHead = cabeza − cámara"]
-    H["Cara<br/>posición"] --> V
-    V --> Y["height = toHead.y<br/>(vertical real)"]
-    V --> P["horizontal = toHead sin y"]
-    C --> F["towardDriver = −eje z de la cámara,<br/>sin y, normalizado"]
-    P --> D["depth = horizontal · towardDriver"]
-    F --> D
-    F --> R["driverRight = (−towardDriver) × arriba"]
-    P --> L["lateral = horizontal · driverRight"]
-    R --> L
-    C --> G["deviceGravity = gravidad<br/>en ejes del móvil"]
+    R["Umbral trasero<br/>(origen)"] --> F["x = adelante<br/>(umbral trasero → delantero)"]
+    G["Gravedad"] --> U["y = arriba<br/>(gravedad, perpendicular a x)"]
+    F --> S["z = lateral<br/>(x × y)"]
+    U --> S
 ```
 
-- **depth** (profundidad): distancia horizontal de la cámara a la cabeza, en
-  la dirección a la que apunta la cámara. Si el asiento va hacia atrás, crece.
-- **height** (altura): cuánto más alta está la cabeza que la cámara,
-  siguiendo la gravedad. Si el asiento sube, crece.
-- **lateral**: desplazamiento horizontal hacia la **derecha del conductor**.
-- **deviceGravity**: la gravedad `(0, −1, 0)` vista desde el móvil. No depende
-  de la cabeza: si cambia, es que el móvil giró en su soporte.
+- `local(p)`: un punto del mundo de ARKit → coordenadas del auto (metros).
+- `world(p)`: al revés, para dibujar el asiento ideal sobre el real.
+- Como `y` se corrige para ser perpendicular al umbral, si el auto está en
+  una pendiente todo gira junto y las medidas no cambian.
 
-Como todo se mide contra la gravedad, da igual que el móvil esté en vertical,
-en horizontal o algo inclinado: lo que cuenta es que esté **igual** que al
-calibrar.
+## 3. El asiento (`SeatPosition`)
 
-## 3. De muchos fotogramas a una medición (`PostureMeasurement`)
-
-Se usa la **mediana** de cada distancia (y la media normalizada de la
-gravedad). Un fotograma raro, como girar la cabeza un instante, no mueve la
-mediana.
-
-| Momento | Fotogramas | Cuándo |
-| ------- | ---------- | ------ |
-| Calibrar | 90 con cara (~1,5 s) | Tras 3 s de cuenta atrás. |
-| Comprobar | Ventana de los últimos 30 (~0,5 s) | Continuo, se refresca ~10 veces por segundo. |
-
-## 4. Comparar (`PositionEvaluator`)
-
-```mermaid
-flowchart TD
-    A["actual − referencia"] --> T{"¿ángulo del móvil > 3°?"}
-    T -- sí --> M["Recoloca el móvil<br/>(y nada más)"]
-    T -- no --> D{"profundidad"}
-    D -- "> +1,5 cm" --> D1["Adelanta el asiento"]
-    D -- "< −1,5 cm" --> D2["Atrasa el asiento"]
-    D --> H{"altura"}
-    H -- "> +1,5 cm" --> H1["Baja el asiento"]
-    H -- "< −1,5 cm" --> H2["Sube el asiento"]
-    H --> L{"lado"}
-    L -- "> +3 cm" --> L1["Siéntate más a tu izquierda"]
-    L -- "< −3 cm" --> L2["Siéntate más a tu derecha"]
+```text
+            backrestUpper ●
+                         /
+                        /  ← ángulo del respaldo (respecto a la vertical del auto)
+                       /
+        backrestLower ●
+                      |
+   ────────────────── ● cushionFront  (x: adelante/atrás, y: altura)
+  umbral ●────────────────────────────● umbral
+       trasero (origen)            delantero
 ```
 
-Si ninguna regla salta: **Todo en su sitio**.
+- **Adelante/atrás** = `cushionFront.x`; **altura** = `cushionFront.y`.
+- **Ángulo del respaldo** = `atan2(−Δx, Δy)` de la línea bajo → alto, en
+  grados. Positivo = inclinado hacia atrás. El eje lateral se ignora.
 
-## 5. Límites
+## 4. La comparación (`SeatEvaluator`)
 
-- El móvil es la regla: si el soporte cambia de **sitio** (no solo de
-  ángulo), la app no puede saberlo.
-- El respaldo mueve la cabeza hacia atrás y abajo a la vez: la app lo
-  interpreta como asiento atrasado o bajado y lo avisa en la pista.
-- Espejos y volante no se miden: van en las notas.
+| Medida | Tolerancia | Si está por encima | Si está por debajo |
+| ------ | ---------- | ------------------ | ------------------ |
+| Cojín, `x` | 1,5 cm | Atrasa el asiento | Adelanta el asiento |
+| Cojín, `y` | 1,5 cm | Baja el asiento | Sube el asiento |
+| Respaldo | 2° | Endereza el respaldo | Inclina el respaldo |
+
+## 5. Lo que se dibuja (`AROverlay`)
+
+| Color | Significado |
+| ----- | ----------- |
+| Azul | El umbral (referencia). |
+| Verde translúcido | El asiento ideal guardado (el "fantasma"). |
+| Naranja | Lo que se mide ahora, si aún no coincide. |
+| Verde | Lo que se mide ahora, cuando ya coincide. |
+
+Durante el respaldo se dibujan la barra actual, la ideal (con la misma
+longitud, desde el mismo punto bajo) y un **arco** de 15 cm de radio entre
+las dos: el ángulo que falta.
+
+## 6. Complemento: la cabeza (cámara frontal)
+
+Con `ARFaceTrackingConfiguration` se mide la cabeza respecto a la cámara
+frontal, en un mundo alineado con la gravedad (`PostureGeometry`):
+**profundidad** (horizontal, por el eje de la cámara), **altura** (vertical)
+y **lado**, más la dirección de la gravedad vista desde el móvil para saber
+si el soporte giró. La referencia es la mediana de 90 fotogramas; la
+comprobación, la de los últimos 30 (`HeadEvaluator`, tolerancias de 1,5 cm,
+3 cm de lado y 3° de móvil).
+
+## 7. Límites
+
+- La precisión depende de marcar siempre los mismos puntos.
+- Un umbral de menos de 30 cm entre puntos, o inclinado más de 30°, se
+  rechaza.
+- La comprobación con la cara depende de que el soporte del móvil no cambie
+  de **sitio** (un cambio de ángulo sí se detecta).

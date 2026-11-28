@@ -1,58 +1,75 @@
 # Uso en el auto
 
-## Lo que necesitas
+## 1. Guardar tu posición (una vez)
 
-- Un iPhone con seguimiento facial (XS, XR o posterior).
-- **Un soporte fijo** para el móvil: de rejilla, de salpicadero o de
-  ventosa. Es la regla de medir: si el soporte cambia de sitio, las medidas
-  cambian. Lo ideal es un soporte que se quede siempre en el auto.
-- Que la cámara frontal te vea la cara desde el asiento (a unos 50–80 cm).
+1. Deja todo a tu gusto: asiento, respaldo, volante y espejos.
+2. Abre la app → **+**. Se abre la **cámara trasera**. Mueve el móvil
+   despacio unos segundos hasta que deje de pedirlo: ARKit está reconociendo
+   el auto.
+3. Con la puerta del conductor abierta, marca estos puntos con la **mira**
+   del centro (cuando la mira se pone verde, pulsa **Marcar**):
 
-## Calibrar (una vez)
+| # | Punto | Dónde exactamente |
+| - | ----- | ----------------- |
+| 1 | Umbral, extremo trasero | El umbral de la puerta, junto al pilar de atrás (B). |
+| 2 | Umbral, extremo delantero | El umbral, junto al pilar de delante (A). |
+| 3 | Borde delantero del cojín | El centro del borde delantero del asiento. |
+| 4 | Respaldo, parte baja | Centro del respaldo, un palmo por encima del cojín. |
+| 5 | Respaldo, parte alta | Centro del respaldo, justo debajo del reposacabezas. |
 
-1. Ajusta todo a tu gusto: asiento, respaldo, volante y espejos.
-2. Pon el móvil en el soporte. Anota cómo va (vertical u horizontal, en qué
-   rejilla).
-3. Abre la app → **+** → escribe un nombre y, en **Notas**, lo que la cámara
-   no mide: *"Volante: 2ª muesca hacia arriba. Espejo izquierdo: veo la
-   manija de la puerta abajo a la derecha"*.
-4. Pulsa **Calibrar**, pon las manos en el volante y mira al frente (hacia el
-   parabrisas, con el móvil a la vista). Tras la cuenta atrás, quédate quieto
-   un segundo y medio.
+4. Ponle nombre y, en **Notas**, lo que la cámara no mide: *"Volante: 2ª
+   muesca. Espejo izquierdo: veo la manija de la puerta abajo a la derecha"*.
+5. **Guardar posición.**
 
-## Comprobar (cada vez que te devuelven el auto)
+> Marca siempre los **mismos** puntos (por ejemplo, una costura o un
+> tornillo del umbral). De eso depende la precisión.
 
-1. Pon el móvil en el soporte **igual que al calibrar**.
-2. Abre tu posición. Siéntate con las manos en el volante.
-3. Sigue las indicaciones, de arriba abajo. Se actualizan solas mientras
-   mueves la palanca:
-   - **Recoloca el móvil** → el soporte o el móvil cambiaron de ángulo.
-     Arréglalo primero; el resto de consejos aparece después.
-   - **Adelanta / atrasa el asiento**.
-   - **Sube / baja el asiento**.
-   - **Siéntate más a tu izquierda / derecha**.
-4. Cuando salga **Todo en su sitio**, revisa la lista de **Revisa también**
-   (espejos, volante).
+## 2. Recuperarla (cada vez que te devuelven el auto)
+
+Abre tu posición → **Ajustar asiento**:
+
+1. **Referencia:** marca otra vez los dos extremos del umbral. Aparece en
+   verde, sobre el asiento real, el **asiento ideal**: una bola donde debe
+   quedar el borde del cojín y una barra con el ángulo del respaldo.
+2. **Cojín:** apunta la mira al borde delantero del cojín. Se dibuja una
+   barra naranja hasta la bola verde y la app dice cuánto mover
+   (*"Adelanta el asiento unos 3 cm"*, *"Sube el asiento unos 2 cm"*). Mueve
+   la palanca con la mira apuntando al cojín hasta que salga **Cojín en su
+   sitio**. → **Siguiente: respaldo**.
+3. **Respaldo:** marca la parte baja del respaldo y apunta a la parte alta.
+   Se dibujan la barra actual (naranja), la ideal (verde) y **el arco del
+   ángulo** entre ambas. Inclina o endereza hasta **Respaldo en su sitio**.
+4. **Terminar:** resumen y tus notas (espejos, volante).
 
 ```mermaid
 flowchart TD
-    A[Móvil en el soporte] --> B{¿Se ve tu cara?}
-    B -- No --> B1[Quita gafas de sol o gorra,<br/>mejora la luz] --> B
-    B -- Sí --> C{¿Ángulo del móvil<br/>como al calibrar?}
-    C -- No --> C1[Recoloca el móvil] --> C
-    C -- Sí --> D{¿Asiento en su sitio?}
-    D -- No --> D1[Mueve la palanca que indica<br/>la app y mira la pantalla] --> D
-    D -- Sí --> E[Todo en su sitio ✔] --> F[Revisa espejos y volante<br/>con tus notas]
+    A[Marcar umbral: 2 puntos] --> B[Aparece el asiento ideal en verde]
+    B --> C{Cojín en su sitio?}
+    C -- No --> C1[Mueve adelante/atrás o la altura<br/>apuntando al cojín] --> C
+    C -- Sí --> D[Marcar respaldo, parte baja]
+    D --> E{Respaldo en su sitio?}
+    E -- No --> E1[Inclina o endereza<br/>apuntando a la parte alta] --> E
+    E -- Sí --> F[Resumen + notas de espejos y volante]
 ```
+
+Si el asiento quedó como te gusta pero distinto del guardado, en el resumen
+puedes **Guardar este asiento como ideal**.
+
+## 3. Complemento: comprobar con tu cara (cámara frontal)
+
+Útil si también llevas el móvil en un soporte fijo del auto.
+
+- **Calibrar con mi cara** (una vez): con el asiento ya en su sitio, pon el
+  móvil en el soporte, pulsa **Calibrar**, manos al volante y mira al frente.
+- **Comprobar con mi cara:** con el móvil en el mismo soporte, te dice si tu
+  cabeza quedó más adelante, atrás, arriba o abajo que en la calibración. Si
+  el soporte cambió de ángulo, te pide recolocarlo primero.
 
 ## Consejos
 
-- **El respaldo también cuenta.** Si la app pide adelantar el asiento pero
-  el asiento está en su muesca de siempre, probablemente el respaldo está más
-  inclinado.
-- Siéntate igual que al calibrar: espalda apoyada, manos en el volante.
-- Si te cambias el soporte de sitio, vuelve a calibrar (menú **⋯ → Guardar
-  posición actual como referencia**).
-- Las medidas tienen ±1 cm de margen. Los rieles del asiento van a saltos;
-  si queda entre dos muescas, elige la que deje "Todo en su sitio".
+- Buena luz: ARKit necesita ver texturas. De noche, enciende la luz interior.
+- Si la alfombrilla tapa el umbral, apunta a la parte de plástico del umbral,
+  no a la alfombrilla.
+- Si la guía da números raros, pulsa **Reiniciar** y vuelve a marcar el umbral.
+- Con LiDAR (iPhone Pro) la mira es más precisa sobre la tapicería.
 - Nunca uses la app manejando: es para ajustar con el auto detenido.

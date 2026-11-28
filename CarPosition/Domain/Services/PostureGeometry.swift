@@ -9,7 +9,7 @@ import Foundation
 /// vertical de verdad y la profundidad siempre es horizontal.
 ///
 /// Vive en el dominio, sin ARKit, para poder probar la geometría con
-/// números ([ADR 0007](../../../docs/adr/0007-arkit-seguimiento-facial.md)).
+/// números ([ADR 0008](../../../docs/adr/0008-camara-frontal-complemento.md)).
 enum PostureGeometry {
     /// - Parameters:
     ///   - cameraPosition: posición de la cámara en el mundo.

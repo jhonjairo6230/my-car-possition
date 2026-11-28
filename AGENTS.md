@@ -1,8 +1,9 @@
 # Mi Posición — notas del proyecto
 
-App de iPhone (SwiftUI + ARKit) que mide la posición de la cabeza del
-conductor respecto al móvil fijo en su soporte y dice qué ajustar para volver
-a una posición guardada. Hermana de DrawPad: mismas reglas. Se compila solo
+App de iPhone (SwiftUI + ARKit) que guía con **realidad aumentada** (cámara
+trasera) hasta la posición guardada del asiento, tomando el umbral de la
+puerta como referencia; como complemento, comprueba con la cámara frontal
+dónde queda la cabeza respecto al móvil en su soporte. Hermana de DrawPad: mismas reglas. Se compila solo
 en GitHub Actions: **no hay Mac ni compilador de Swift en local**.
 Documentación en `docs/`; decisiones en `docs/adr/`.
 
@@ -11,13 +12,19 @@ Documentación en `docs/`; decisiones en `docs/adr/`.
 - `CarPosition/Domain` solo importa `Foundation`. Nada de `SwiftUI`, `UIKit`,
   `ARKit`, `simd` ni `SwiftData`. La geometría usa `Vector3`.
 - `Presentation` no conoce `Data`: el ViewModel recibe casos de uso.
-- ARKit solo se toca en `Presentation/Tracking/ARKitHeadTracker.swift`. Los
-  ViewModel usan el protocolo `HeadTracker`; las vistas, `CameraPreviewSource`.
-- Hay **un solo** rastreador en toda la app (una sesión de ARKit). Cada
-  pantalla lo toma en `onAppear` y lo suelta en `onDisappear`.
+- ARKit solo se toca en `Presentation/Scanning/ARKitSeatScanner.swift`
+  (cámara trasera) y `Presentation/Tracking/ARKitHeadTracker.swift` (frontal).
+  Los ViewModel usan los protocolos `SeatScanner` y `HeadTracker`; las vistas,
+  `CameraPreviewSource`. Lo que se dibuja en AR se describe con `AROverlay`
+  (los ViewModel no conocen SceneKit).
+- Hay **una** instancia de cada cámara. Cada pantalla la toma en `onAppear`
+  y la suelta en `onDisappear`. Nunca se navega directamente de una pantalla
+  con cámara a otra con cámara.
+- El asiento se guarda en coordenadas del auto (`CarFrame`, a partir del
+  umbral), nunca en coordenadas de ARKit, que cambian en cada sesión.
 - Las implementaciones concretas solo se crean en `App/AppContainer.swift`,
-  todo `lazy`. Con `-uiTesting`: base de datos en memoria y
-  `SimulatedHeadTracker`.
+  todo `lazy`. Con `-uiTesting`: base de datos en memoria,
+  `SimulatedSeatScanner` y `SimulatedHeadTracker`.
 - `Data` convierte sus errores a `PositionError`.
 - `ProfileRecord` (`@Model`) no sale de `Data`. Toda propiedad nueva debe ser
   **opcional** o tener valor por defecto (ver `docs/adr/0006-swiftdata.md`).
@@ -39,7 +46,7 @@ Documentación en `docs/`; decisiones en `docs/adr/`.
 Push a la rama y mirar el workflow **Compilar IPA**
 (`.github/workflows/build.yml`): pruebas unitarias y de interfaz en un
 simulador de iPhone y publica `CarPosition-unsigned.ipa`. ARKit no funciona en
-el simulador: la medición real se prueba en el auto.
+el simulador: la realidad aumentada y las medidas reales se prueban en el auto.
 
 ## Documentación
 
