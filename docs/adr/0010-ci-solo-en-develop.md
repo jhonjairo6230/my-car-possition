@@ -1,6 +1,6 @@
 # 0010. El workflow solo corre al fusionar en develop (o a mano)
 
-- **Estado:** Aceptada
+- **Estado:** Reemplazada por [0011](0011-ipa-y-pruebas-en-paralelo.md)
 - **Fecha:** 2026-11-28
 
 ## Contexto

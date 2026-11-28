@@ -15,8 +15,9 @@ Reglas:
 
 - **Nunca** commits directos en `main` ni en `develop`: siempre por pull
   request.
-- El workflow **Compilar IPA** corre al fusionar en `develop` (o a mano
-  desde Actions). Ver [ADR 0010](adr/0010-ci-solo-en-develop.md).
+- Antes de fusionar, el trabajo **Pruebas** del workflow tiene que estar en
+  verde. El `.ipa` se genera al fusionar en `develop` o `main` (o a mano).
+  Ver [ADR 0011](adr/0011-ipa-y-pruebas-en-paralelo.md).
 - **Nunca** un pull request de `develop` a `main`: se pasa por `release/`.
 - Solo esos prefijos, en minúsculas y con guiones (nada de `claude/…`).
 

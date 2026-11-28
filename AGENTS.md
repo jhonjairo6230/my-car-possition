@@ -43,12 +43,15 @@ Documentación en `docs/`; decisiones en `docs/adr/`.
 
 ## Comprobar un cambio
 
-El workflow **Compilar IPA** solo corre al fusionar en `develop` o a mano
-(Actions → Compilar IPA → Run workflow, eligiendo la rama); ver
-`docs/adr/0010-ci-solo-en-develop.md`. El workflow
-(`.github/workflows/build.yml`) ejecuta las pruebas unitarias y de interfaz en un
-simulador de iPhone y publica `CarPosition-unsigned.ipa`. ARKit no funciona en
-el simulador: la realidad aumentada y las medidas reales se prueban en el auto.
+Push a la rama y mirar el workflow **Compilar IPA**
+(`.github/workflows/build.yml`). Tiene dos trabajos en paralelo: **Pruebas**
+corre las unitarias y de interfaz en un simulador de iPhone en cada push y
+pull request; **IPA** compila y publica `CarPosition-unsigned.ipa` (unos 3
+minutos) **solo al fusionar en `develop` o `main`**, o con Run workflow sobre
+una rama (ver `docs/adr/0011-ipa-y-pruebas-en-paralelo.md`). Que haya `.ipa`
+solo significa que la app compila, no que las pruebas hayan pasado. ARKit no
+funciona en el simulador: la realidad aumentada y las medidas reales se
+prueban en el auto.
 
 ## Documentación
 

@@ -19,7 +19,8 @@ aplican se han **adoptado** aquí con su propio número.
 | [0007](0007-guia-ar-del-asiento.md) | Guiar el asiento con realidad aumentada (cámara trasera), tomando el umbral como referencia | Propio | Aceptada |
 | [0008](0008-camara-frontal-complemento.md) | Comprobar con la cara (cámara frontal) como complemento | Propio | Aceptada |
 | [0009](0009-comparacion-en-vivo.md) | Comparar con mediana, tolerancias fijas y veredicto en vivo | Propio | Aceptada |
-| [0010](0010-ci-solo-en-develop.md) | El workflow solo corre al fusionar en develop (o a mano) | Propio | Aceptada |
+| [0010](0010-ci-solo-en-develop.md) | El workflow solo corre al fusionar en develop (o a mano) | Propio | Reemplazada por 0011 |
+| [0011](0011-ipa-y-pruebas-en-paralelo.md) | IPA y pruebas en paralelo; el `.ipa` solo al fusionar | DrawPad 0014 + 0023 | Aceptada |
 
 ADR de DrawPad que **no** aplican (son del lienzo de dibujo): 0005 PencilKit,
 0008 papel y tema, 0009 zoom, 0010 cuadernos y 0011 suavizar trazos.
