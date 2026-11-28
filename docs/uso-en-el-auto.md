@@ -7,12 +7,27 @@
    despacio unos segundos hasta que deje de pedirlo: ARKit está reconociendo
    el auto.
 3. Con la puerta del conductor abierta, marca estos puntos con la **mira**
-   del centro (cuando la mira se pone verde, pulsa **Marcar**):
+   del centro (cuando la mira se pone verde, pulsa **Marcar**). En la app, el
+   botón **¿Qué es la pisadera?** lo explica con un dibujo.
+
+La **pisadera** es la parte de abajo del marco de la puerta: la franja que
+pisas o sobre la que pasas el pie al subir (también se le dice estribo o
+umbral). El **pilar B** es el poste entre tu puerta y la de atrás; el
+**pilar A**, el del lado de las bisagras, hacia el parabrisas.
+
+```text
+ pilar A (bisagras, parabrisas)          pilar B (entre tu puerta y la de atrás)
+      │                                    │
+      │        hueco de la puerta          │
+      │                                    │
+      └──────────────── pisadera ──────────┘
+      ● 2. extremo delantero   1. extremo trasero ●
+```
 
 | # | Punto | Dónde exactamente |
 | - | ----- | ----------------- |
-| 1 | Umbral, extremo trasero | El umbral de la puerta, junto al pilar de atrás (B). |
-| 2 | Umbral, extremo delantero | El umbral, junto al pilar de delante (A). |
+| 1 | Pisadera, extremo trasero | El final de la pisadera junto al pilar B. |
+| 2 | Pisadera, extremo delantero | El otro final, junto al pilar A. |
 | 3 | Borde delantero del cojín | El centro del borde delantero del asiento. |
 | 4 | Respaldo, parte baja | Centro del respaldo, un palmo por encima del cojín. |
 | 5 | Respaldo, parte alta | Centro del respaldo, justo debajo del reposacabezas. |
@@ -21,14 +36,14 @@
    muesca. Espejo izquierdo: veo la manija de la puerta abajo a la derecha"*.
 5. **Guardar posición.**
 
-> Marca siempre los **mismos** puntos (por ejemplo, una costura o un
-> tornillo del umbral). De eso depende la precisión.
+> Marca siempre los **mismos** puntos (por ejemplo, un tornillo o el borde
+> de la placa de la pisadera). De eso depende la precisión.
 
 ## 2. Recuperarla (cada vez que te devuelven el auto)
 
 Abre tu posición → **Ajustar asiento**:
 
-1. **Referencia:** marca otra vez los dos extremos del umbral. Aparece en
+1. **Referencia:** marca otra vez los dos extremos de la pisadera. Aparece en
    verde, sobre el asiento real, el **asiento ideal**: una bola donde debe
    quedar el borde del cojín y una barra con el ángulo del respaldo.
 2. **Cojín:** apunta la mira al borde delantero del cojín. Se dibuja una
@@ -43,7 +58,7 @@ Abre tu posición → **Ajustar asiento**:
 
 ```mermaid
 flowchart TD
-    A[Marcar umbral: 2 puntos] --> B[Aparece el asiento ideal en verde]
+    A[Marcar pisadera: 2 puntos] --> B[Aparece el asiento ideal en verde]
     B --> C{Cojín en su sitio?}
     C -- No --> C1[Mueve adelante/atrás o la altura<br/>apuntando al cojín] --> C
     C -- Sí --> D[Marcar respaldo, parte baja]
@@ -68,8 +83,8 @@ puedes **Guardar este asiento como ideal**.
 ## Consejos
 
 - Buena luz: ARKit necesita ver texturas. De noche, enciende la luz interior.
-- Si la alfombrilla tapa el umbral, apunta a la parte de plástico del umbral,
-  no a la alfombrilla.
-- Si la guía da números raros, pulsa **Reiniciar** y vuelve a marcar el umbral.
+- Si la alfombrilla tapa la pisadera, apunta a la parte de plástico, no a la
+  alfombrilla.
+- Si la guía da números raros, pulsa **Reiniciar** y vuelve a marcar la pisadera.
 - Con LiDAR (iPhone Pro) la mira es más precisa sobre la tapicería.
 - Nunca uses la app manejando: es para ajustar con el auto detenido.

@@ -14,7 +14,8 @@ estimación). El punto de choque tiembla unos milímetros, así que se usa la
 ## 2. El sistema del auto (`CarFrame`)
 
 ARKit cambia de origen en cada sesión, así que nada se guarda en sus
-coordenadas. Con los dos puntos del umbral se construyen unos ejes **pegados
+coordenadas. Con los dos puntos del umbral (en la app, **pisadera**: la parte
+de abajo del marco de la puerta) se construyen unos ejes **pegados
 al auto**:
 
 ```mermaid

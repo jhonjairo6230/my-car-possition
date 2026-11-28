@@ -48,7 +48,7 @@ struct ProfileScreen: View {
 
             if let profile = viewModel.profile {
                 Section("Medidas guardadas") {
-                    LabeledContent("Borde del cojín", value: String(format: "%.0f cm desde el umbral", profile.seat.cushionFront.x * 100))
+                    LabeledContent("Borde del cojín", value: String(format: "%.0f cm desde la pisadera", profile.seat.cushionFront.x * 100))
                     LabeledContent("Altura del cojín", value: String(format: "%.0f cm", profile.seat.cushionFront.y * 100))
                     LabeledContent("Respaldo", value: String(format: "%.0f°", profile.seat.backrestAngle))
                 }
