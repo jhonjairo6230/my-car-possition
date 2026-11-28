@@ -1,14 +1,15 @@
 import SwiftUI
 import UIKit
 
-/// Pantalla para guardar una posición nueva.
-struct CalibrationScreen: View {
-    @State private var viewModel: CalibrationViewModel
+/// Calibrar con la **cámara frontal**: guarda dónde queda la cabeza respecto
+/// al móvil en su soporte, como complemento de la posición.
+struct HeadCalibrationScreen: View {
+    @State private var viewModel: HeadCalibrationViewModel
     let cameraPreview: CameraPreviewSource
 
     @Environment(\.dismiss) private var dismiss
 
-    init(viewModel: CalibrationViewModel, cameraPreview: CameraPreviewSource) {
+    init(viewModel: HeadCalibrationViewModel, cameraPreview: CameraPreviewSource) {
         // `State(wrappedValue:)` guarda el ViewModel la primera vez: si SwiftUI
         // vuelve a crear esta vista, se conserva el mismo.
         _viewModel = State(wrappedValue: viewModel)
@@ -20,10 +21,10 @@ struct CalibrationScreen: View {
             if viewModel.isSupported {
                 content
             } else {
-                UnsupportedDeviceView()
+                UnsupportedDeviceView(camera: .front)
             }
         }
-        .navigationTitle("Nueva posición")
+        .navigationTitle("Calibrar con mi cara")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { viewModel.onAppear() }
         .onDisappear { viewModel.onDisappear() }
@@ -54,23 +55,12 @@ struct CalibrationScreen: View {
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Cómo calibrar").font(.headline)
-                    Text("1. Ajusta asiento, respaldo, volante y espejos a tu gusto.")
+                    Text("1. Deja el asiento en tu posición ideal (usa antes la guía con la cámara trasera).")
                     Text("2. Pon el móvil en su soporte, siempre en el mismo sitio y ángulo.")
                     Text("3. Pulsa Calibrar, pon las manos en el volante y mira al frente unos segundos.")
                 }
                 .font(.subheadline)
 
-                TextField("Nombre", text: $viewModel.name)
-                    .textFieldStyle(.roundedBorder)
-                    .accessibilityIdentifier("profileName")
-
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Notas (lo que la cámara no mide)").font(.subheadline.weight(.semibold))
-                    TextField("Volante: 2ª muesca. Espejo izquierdo: ver la manija…", text: $viewModel.notes, axis: .vertical)
-                        .lineLimit(3...6)
-                        .textFieldStyle(.roundedBorder)
-                        .accessibilityIdentifier("profileNotes")
-                }
 
                 actionButton
             }

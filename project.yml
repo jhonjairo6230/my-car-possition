@@ -32,7 +32,7 @@ targets:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
-        NSCameraUsageDescription: Mi Posición usa la cámara frontal para medir dónde está tu cabeza respecto al móvil. Las imágenes no se guardan ni salen del teléfono.
+        NSCameraUsageDescription: Mi Posición usa la cámara trasera para medir el asiento con realidad aumentada y, si quieres, la frontal para comprobar dónde queda tu cabeza. Las imágenes no se guardan ni salen del teléfono.
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.jhonjairo6230.carposition

@@ -1,17 +1,17 @@
 import SwiftUI
 
-/// Pantalla de comprobación: "¿está el auto como lo dejé?".
+/// Comprobación con la **cámara frontal**: "¿mi cabeza queda donde siempre?".
+/// Complementa la guía del asiento.
 ///
 /// Muestra la cámara, el veredicto en vivo y las notas de la posición (lo
 /// que la cámara no mide: espejos, volante…).
-struct CheckScreen: View {
-    @State private var viewModel: CheckViewModel
+struct HeadCheckScreen: View {
+    @State private var viewModel: HeadCheckViewModel
     let cameraPreview: CameraPreviewSource
 
     @State private var isConfirmingReference = false
-    @State private var isEditingDetails = false
 
-    init(viewModel: CheckViewModel, cameraPreview: CameraPreviewSource) {
+    init(viewModel: HeadCheckViewModel, cameraPreview: CameraPreviewSource) {
         _viewModel = State(wrappedValue: viewModel)
         self.cameraPreview = cameraPreview
     }
@@ -21,7 +21,7 @@ struct CheckScreen: View {
             if viewModel.isSupported {
                 content
             } else {
-                UnsupportedDeviceView()
+                UnsupportedDeviceView(camera: .front)
             }
         }
         .navigationTitle(viewModel.profile?.name ?? "Comprobar")
@@ -33,11 +33,6 @@ struct CheckScreen: View {
                         isConfirmingReference = true
                     } label: {
                         Label("Guardar posición actual como referencia", systemImage: "scope")
-                    }
-                    Button {
-                        isEditingDetails = true
-                    } label: {
-                        Label("Editar nombre y notas", systemImage: "pencil")
                     }
                 } label: {
                     Label("Más", systemImage: "ellipsis.circle")
@@ -52,13 +47,6 @@ struct CheckScreen: View {
             Button("Guardar como referencia") { viewModel.saveCurrentAsReference() }
         } message: {
             Text("Hazlo solo si ahora estás sentado exactamente como te gusta.")
-        }
-        .sheet(isPresented: $isEditingDetails) {
-            if let profile = viewModel.profile {
-                ProfileDetailsForm(name: profile.name, notes: profile.notes) { name, notes in
-                    viewModel.saveDetails(name: name, notes: notes)
-                }
-            }
         }
         .onAppear { viewModel.onAppear() }
         .onDisappear { viewModel.onDisappear() }
@@ -138,7 +126,7 @@ struct CheckScreen: View {
     }
 
     /// Las diferencias en bruto, para quien quiera los números.
-    private func offsets(_ evaluation: PositionEvaluation) -> some View {
+    private func offsets(_ evaluation: HeadEvaluation) -> some View {
         Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 4) {
             GridRow {
                 Text("Adelante/atrás")
@@ -163,39 +151,5 @@ struct CheckScreen: View {
 
     private static func centimeters(_ meters: Double) -> String {
         String(format: "%+.1f cm", meters * 100)
-    }
-}
-
-/// Hoja para cambiar el nombre y las notas de una posición.
-private struct ProfileDetailsForm: View {
-    @State var name: String
-    @State var notes: String
-    /// Devuelve `true` si se guardó; entonces la hoja se cierra.
-    let onSave: (String, String) -> Bool
-
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                TextField("Nombre", text: $name)
-                Section("Notas") {
-                    TextField("Volante, espejos, respaldo…", text: $notes, axis: .vertical)
-                        .lineLimit(3...8)
-                }
-            }
-            .navigationTitle("Editar posición")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancelar") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Guardar") {
-                        if onSave(name, notes) { dismiss() }
-                    }
-                }
-            }
-        }
     }
 }

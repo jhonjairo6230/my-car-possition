@@ -1,22 +1,14 @@
 import SwiftUI
 
-/// Pantalla principal: las posiciones guardadas.
+/// Pantalla principal: las posiciones guardadas y la navegación de la app.
 ///
-/// Tocar una posición abre la comprobación; el botón "+" abre la
-/// calibración de una nueva. Las pantallas siguientes se crean con las
-/// fábricas que entrega el ``AppContainer``.
+/// El "+" abre la calibración del asiento con la cámara trasera. Tocar una
+/// posición abre su ficha, desde donde se llega a las dos guías.
 struct ProfilesScreen: View {
     @Bindable var viewModel: ProfilesViewModel
-    let cameraPreview: CameraPreviewSource
-    let makeCalibration: () -> CalibrationViewModel
-    let makeCheck: (UUID) -> CheckViewModel
+    let screens: ScreenFactory
 
-    @State private var path: [Route] = []
-
-    enum Route: Hashable {
-        case newProfile
-        case check(UUID)
-    }
+    @State private var path: [AppRoute] = []
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -37,14 +29,7 @@ struct ProfilesScreen: View {
                     }
                 }
             }
-            .navigationDestination(for: Route.self) { route in
-                switch route {
-                case .newProfile:
-                    CalibrationScreen(viewModel: makeCalibration(), cameraPreview: cameraPreview)
-                case .check(let id):
-                    CheckScreen(viewModel: makeCheck(id), cameraPreview: cameraPreview)
-                }
-            }
+            .navigationDestination(for: AppRoute.self, destination: destination)
             .onAppear { viewModel.load() }
             .onChange(of: path) { _, newPath in
                 if newPath.isEmpty { viewModel.load() }
@@ -55,11 +40,27 @@ struct ProfilesScreen: View {
         }
     }
 
+    @ViewBuilder
+    private func destination(_ route: AppRoute) -> some View {
+        switch route {
+        case .newProfile:
+            SeatCalibrationScreen(viewModel: screens.makeSeatCalibration(), preview: screens.seatPreview)
+        case .profile(let id):
+            ProfileScreen(viewModel: screens.makeProfile(id))
+        case .seatCheck(let id):
+            SeatCheckScreen(viewModel: screens.makeSeatCheck(id), preview: screens.seatPreview)
+        case .headCalibration(let id):
+            HeadCalibrationScreen(viewModel: screens.makeHeadCalibration(id), cameraPreview: screens.headPreview)
+        case .headCheck(let id):
+            HeadCheckScreen(viewModel: screens.makeHeadCheck(id), cameraPreview: screens.headPreview)
+        }
+    }
+
     private var emptyState: some View {
         ContentUnavailableView {
             Label("Aún no hay posiciones", systemImage: "car.side")
         } description: {
-            Text("Siéntate como te gusta manejar, pon el móvil en su soporte y guarda esa posición. Cuando te devuelvan el auto, la app te dirá qué ajustar.")
+            Text("Deja el asiento como te gusta y márcalo con la cámara trasera. Cuando te devuelvan el auto, la app te guiará con realidad aumentada hasta esa posición.")
         } actions: {
             Button("Guardar mi posición") {
                 path.append(.newProfile)
@@ -71,11 +72,11 @@ struct ProfilesScreen: View {
     private var list: some View {
         List {
             ForEach(viewModel.profiles) { profile in
-                NavigationLink(value: Route.check(profile.id)) {
+                NavigationLink(value: AppRoute.profile(profile.id)) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(profile.name)
                             .font(.headline)
-                        Text("Referencia del \(profile.updatedAt.formatted(date: .abbreviated, time: .shortened))")
+                        Text("Guardada el \(profile.updatedAt.formatted(date: .abbreviated, time: .shortened))")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }

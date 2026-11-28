@@ -2,16 +2,20 @@ import XCTest
 @testable import CarPosition
 
 @MainActor
-final class CalibrationViewModelTests: XCTestCase {
+final class HeadCalibrationViewModelTests: XCTestCase {
     private var repository: InMemoryProfileRepository!
     private var tracker: FakeHeadTracker!
+    /// Posición con el asiento medido pero sin referencia de la cabeza.
+    private var original: DrivingProfile!
 
-    private func makeViewModel(samplesNeeded: Int = 5, maxFrames: Int = 20) -> CalibrationViewModel {
-        repository = InMemoryProfileRepository()
+    private func makeViewModel(samplesNeeded: Int = 5, maxFrames: Int = 20) -> HeadCalibrationViewModel {
+        original = .sample(name: "Mía", head: nil)
+        repository = InMemoryProfileRepository([original])
         tracker = FakeHeadTracker()
-        let viewModel = CalibrationViewModel(
+        let viewModel = HeadCalibrationViewModel(
+            profileID: original.id,
             tracker: tracker,
-            createProfile: CreateProfileUseCase(repository: repository),
+            updateHeadReference: UpdateHeadReferenceUseCase(repository: repository),
             countdownSeconds: 3,
             samplesNeeded: samplesNeeded,
             maxFrames: maxFrames,
@@ -50,13 +54,11 @@ final class CalibrationViewModelTests: XCTestCase {
         tracker.emit(.cm(), count: 10)
 
         XCTAssertEqual(viewModel.phase, .ready)
-        XCTAssertTrue(repository.profiles.isEmpty)
+        XCTAssertNil(repository.profiles[original.id]?.head)
     }
 
-    func testCalibratingSavesTheMedianPosition() async throws {
+    func testCalibratingSavesTheMedianHeadIntoTheProfile() async throws {
         let viewModel = makeViewModel(samplesNeeded: 5)
-        viewModel.name = "  Mía "
-        viewModel.notes = "Volante 2ª muesca"
 
         await viewModel.startCapture()?.value
         XCTAssertEqual(viewModel.phase, .capturing(progress: 0))
@@ -69,10 +71,10 @@ final class CalibrationViewModelTests: XCTestCase {
         guard case .saved(let profile) = viewModel.phase else {
             return XCTFail("Se esperaba .saved y es \(viewModel.phase)")
         }
-        XCTAssertEqual(profile.name, "Mía")
-        XCTAssertEqual(profile.notes, "Volante 2ª muesca")
-        XCTAssertEqual(profile.reference.depth, 0.60, accuracy: 1e-9)
-        XCTAssertEqual(profile.reference.sampleCount, 5)
+        XCTAssertEqual(profile.id, original.id)
+        XCTAssertEqual(profile.seat, original.seat)
+        XCTAssertEqual(profile.head?.depth ?? 0, 0.60, accuracy: 1e-9)
+        XCTAssertEqual(profile.head?.sampleCount, 5)
         XCTAssertEqual(repository.profiles[profile.id], profile)
     }
 
@@ -85,17 +87,7 @@ final class CalibrationViewModelTests: XCTestCase {
 
         XCTAssertEqual(viewModel.phase, .ready)
         XCTAssertEqual(viewModel.alert, AlertMessage(error: PositionError.faceNotFound))
-        XCTAssertTrue(repository.profiles.isEmpty)
-    }
-
-    func testAnEmptyNameShowsAnAlertAndDoesNotStart() {
-        let viewModel = makeViewModel()
-        viewModel.name = "  "
-
-        XCTAssertFalse(viewModel.canStart)
-        XCTAssertNil(viewModel.startCapture())
-        XCTAssertEqual(viewModel.alert, AlertMessage(error: PositionError.invalidName))
-        XCTAssertEqual(viewModel.phase, .ready)
+        XCTAssertNil(repository.profiles[original.id]?.head)
     }
 
     func testCancellingGoesBackToReady() async {
@@ -106,7 +98,7 @@ final class CalibrationViewModelTests: XCTestCase {
         tracker.emit(.cm(), count: 10)
 
         XCTAssertEqual(viewModel.phase, .ready)
-        XCTAssertTrue(repository.profiles.isEmpty)
+        XCTAssertNil(repository.profiles[original.id]?.head)
     }
 
     func testUnsupportedDevicesCannotStart() {

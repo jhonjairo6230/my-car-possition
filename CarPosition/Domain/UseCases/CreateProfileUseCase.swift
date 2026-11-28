@@ -1,6 +1,6 @@
 import Foundation
 
-/// Guarda una posición nueva a partir de una calibración.
+/// Guarda una posición nueva a partir de la medición del asiento.
 struct CreateProfileUseCase {
     private let repository: ProfileRepository
     /// Reloj e identificadores inyectables: en las pruebas se fijan.
@@ -19,7 +19,7 @@ struct CreateProfileUseCase {
 
     /// - Throws: ``PositionError/invalidName`` si el nombre está vacío.
     @discardableResult
-    func execute(name: String, notes: String, reference: PostureMeasurement) throws -> DrivingProfile {
+    func execute(name: String, notes: String, seat: SeatPosition) throws -> DrivingProfile {
         let name = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty else { throw PositionError.invalidName }
         let date = now()
@@ -27,7 +27,8 @@ struct CreateProfileUseCase {
             id: makeID(),
             name: name,
             notes: notes.trimmingCharacters(in: .whitespacesAndNewlines),
-            reference: reference,
+            seat: seat,
+            head: nil,
             createdAt: date,
             updatedAt: date
         )

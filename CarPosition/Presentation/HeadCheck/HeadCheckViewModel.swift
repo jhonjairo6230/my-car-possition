@@ -1,18 +1,19 @@
 import Foundation
 import Observation
 
-/// Estado y acciones de la comprobación: compara **en vivo** la posición
-/// actual con la guardada y dice qué ajustar.
+/// Estado y acciones de la comprobación con la **cámara frontal**: compara
+/// **en vivo** dónde queda la cabeza respecto al móvil con la referencia
+/// guardada y dice qué ajustar. Es el complemento de la guía del asiento.
 ///
 /// Usa una ventana con los últimos fotogramas (medio segundo): así el
 /// conductor puede mover el asiento mirando la pantalla y ver cómo cambian
 /// los centímetros hasta que sale "Todo en su sitio".
 @MainActor
 @Observable
-final class CheckViewModel {
+final class HeadCheckViewModel {
     private(set) var profile: DrivingProfile?
     /// Última comparación; `nil` hasta tener una lectura estable.
-    private(set) var evaluation: PositionEvaluation?
+    private(set) var evaluation: HeadEvaluation?
     /// `true` si en el último fotograma se veía una cara.
     private(set) var isFaceDetected = false
     var alert: AlertMessage?
@@ -22,9 +23,8 @@ final class CheckViewModel {
     private let profileID: UUID
     private let tracker: HeadTracker
     private let loadProfile: LoadProfileUseCase
-    private let evaluatePosition: EvaluatePositionUseCase
-    private let updateReference: UpdateReferenceUseCase
-    private let updateNotes: UpdateNotesUseCase
+    private let evaluatePosition: EvaluateHeadUseCase
+    private let updateReference: UpdateHeadReferenceUseCase
     private let windowSize: Int
     private let minimumSamples: Int
     /// Cada cuántos fotogramas se recalcula la comparación en pantalla.
@@ -37,9 +37,8 @@ final class CheckViewModel {
         profileID: UUID,
         tracker: HeadTracker,
         loadProfile: LoadProfileUseCase,
-        evaluatePosition: EvaluatePositionUseCase,
-        updateReference: UpdateReferenceUseCase,
-        updateNotes: UpdateNotesUseCase,
+        evaluatePosition: EvaluateHeadUseCase,
+        updateReference: UpdateHeadReferenceUseCase,
         windowSize: Int = 30,
         minimumSamples: Int = 10,
         refreshEvery: Int = 6
@@ -49,7 +48,6 @@ final class CheckViewModel {
         self.loadProfile = loadProfile
         self.evaluatePosition = evaluatePosition
         self.updateReference = updateReference
-        self.updateNotes = updateNotes
         self.windowSize = max(1, windowSize)
         self.minimumSamples = max(1, min(minimumSamples, windowSize))
         self.refreshEvery = max(1, refreshEvery)
@@ -111,19 +109,6 @@ final class CheckViewModel {
             alert = .referenceUpdated
         } catch {
             alert = AlertMessage(error: error)
-        }
-    }
-
-    /// Cambia el nombre y las notas.
-    /// - Returns: `true` si se guardó.
-    @discardableResult
-    func saveDetails(name: String, notes: String) -> Bool {
-        do {
-            profile = try updateNotes.execute(id: profileID, name: name, notes: notes)
-            return true
-        } catch {
-            alert = AlertMessage(error: error)
-            return false
         }
     }
 

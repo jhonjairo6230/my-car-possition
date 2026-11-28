@@ -9,10 +9,10 @@ import Foundation
 ///    (3° a 60 cm son 3 cm) y los demás consejos serían falsos.
 /// 2. Si no, cada eje fuera de tolerancia produce un ajuste, en el orden en
 ///    que conviene hacerlos: primero adelante/atrás, luego altura, luego lado.
-struct PositionEvaluator {
-    var tolerance: Tolerance = .standard
+struct HeadEvaluator {
+    var tolerance: HeadTolerance = .standard
 
-    func evaluate(current: PostureMeasurement, reference: PostureMeasurement) -> PositionEvaluation {
+    func evaluate(current: PostureMeasurement, reference: PostureMeasurement) -> HeadEvaluation {
         let depthOffset = current.depth - reference.depth
         let heightOffset = current.height - reference.height
         let lateralOffset = current.lateral - reference.lateral
@@ -23,33 +23,28 @@ struct PositionEvaluator {
             adjustments = [.realignPhone(degrees: Int(tilt.rounded()))]
         } else {
             if depthOffset > tolerance.depth {
-                adjustments.append(.moveSeatForward(centimeters: Self.centimeters(depthOffset)))
+                adjustments.append(.moveSeatForward(centimeters: Adjustment.centimeters(depthOffset)))
             } else if depthOffset < -tolerance.depth {
-                adjustments.append(.moveSeatBackward(centimeters: Self.centimeters(depthOffset)))
+                adjustments.append(.moveSeatBackward(centimeters: Adjustment.centimeters(depthOffset)))
             }
             if heightOffset > tolerance.height {
-                adjustments.append(.lowerSeat(centimeters: Self.centimeters(heightOffset)))
+                adjustments.append(.lowerSeat(centimeters: Adjustment.centimeters(heightOffset)))
             } else if heightOffset < -tolerance.height {
-                adjustments.append(.raiseSeat(centimeters: Self.centimeters(heightOffset)))
+                adjustments.append(.raiseSeat(centimeters: Adjustment.centimeters(heightOffset)))
             }
             if lateralOffset > tolerance.lateral {
-                adjustments.append(.shiftLeft(centimeters: Self.centimeters(lateralOffset)))
+                adjustments.append(.shiftLeft(centimeters: Adjustment.centimeters(lateralOffset)))
             } else if lateralOffset < -tolerance.lateral {
-                adjustments.append(.shiftRight(centimeters: Self.centimeters(lateralOffset)))
+                adjustments.append(.shiftRight(centimeters: Adjustment.centimeters(lateralOffset)))
             }
         }
 
-        return PositionEvaluation(
+        return HeadEvaluation(
             depthOffset: depthOffset,
             heightOffset: heightOffset,
             lateralOffset: lateralOffset,
             phoneTiltChange: tilt,
             adjustments: adjustments
         )
-    }
-
-    /// Metros → centímetros enteros, al menos 1.
-    static func centimeters(_ meters: Double) -> Int {
-        max(1, Int((abs(meters) * 100).rounded()))
     }
 }

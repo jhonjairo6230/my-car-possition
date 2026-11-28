@@ -2,22 +2,21 @@ import XCTest
 @testable import CarPosition
 
 @MainActor
-final class CheckViewModelTests: XCTestCase {
+final class HeadCheckViewModelTests: XCTestCase {
     private var repository: InMemoryProfileRepository!
     private var tracker: FakeHeadTracker!
     private var profile: DrivingProfile!
 
-    private func makeViewModel(reference: PostureMeasurement = .cm(depth: 60, height: 10)) -> CheckViewModel {
-        profile = .sample(name: "Mía", notes: "Espejos", reference: reference)
+    private func makeViewModel(reference: PostureMeasurement = .cm(depth: 60, height: 10)) -> HeadCheckViewModel {
+        profile = .sample(name: "Mía", notes: "Espejos", head: reference)
         repository = InMemoryProfileRepository([profile])
         tracker = FakeHeadTracker()
-        let viewModel = CheckViewModel(
+        let viewModel = HeadCheckViewModel(
             profileID: profile.id,
             tracker: tracker,
             loadProfile: LoadProfileUseCase(repository: repository),
-            evaluatePosition: EvaluatePositionUseCase(),
-            updateReference: UpdateReferenceUseCase(repository: repository),
-            updateNotes: UpdateNotesUseCase(repository: repository),
+            evaluatePosition: EvaluateHeadUseCase(),
+            updateReference: UpdateHeadReferenceUseCase(repository: repository),
             windowSize: 10,
             minimumSamples: 5,
             refreshEvery: 1
@@ -79,7 +78,7 @@ final class CheckViewModelTests: XCTestCase {
         viewModel.saveCurrentAsReference()
 
         XCTAssertEqual(viewModel.alert, .referenceUpdated)
-        XCTAssertEqual(repository.profiles[profile.id]?.reference.depth ?? 0, 0.66, accuracy: 1e-9)
+        XCTAssertEqual(repository.profiles[profile.id]?.head?.depth ?? 0, 0.66, accuracy: 1e-9)
         XCTAssertEqual(viewModel.evaluation?.isMatch, true)
     }
 
@@ -91,22 +90,6 @@ final class CheckViewModelTests: XCTestCase {
 
         XCTAssertEqual(viewModel.alert, AlertMessage(error: PositionError.notEnoughSamples))
         XCTAssertEqual(repository.profiles[profile.id], profile)
-    }
-
-    func testEditingNameAndNotes() {
-        let viewModel = makeViewModel()
-
-        XCTAssertTrue(viewModel.saveDetails(name: "Lluvia", notes: "Volante arriba"))
-
-        XCTAssertEqual(viewModel.profile?.name, "Lluvia")
-        XCTAssertEqual(repository.profiles[profile.id]?.notes, "Volante arriba")
-    }
-
-    func testEditingWithAnEmptyNameFails() {
-        let viewModel = makeViewModel()
-
-        XCTAssertFalse(viewModel.saveDetails(name: " ", notes: ""))
-        XCTAssertEqual(viewModel.alert, AlertMessage(error: PositionError.invalidName))
     }
 
     func testAMissingProfileShowsAnAlert() {

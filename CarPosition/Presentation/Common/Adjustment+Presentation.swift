@@ -19,6 +19,10 @@ extension Adjustment {
             return "Siéntate unos \(cm) cm más a tu izquierda"
         case .shiftRight(let cm):
             return "Siéntate unos \(cm) cm más a tu derecha"
+        case .reclineBackrest(let degrees):
+            return "Inclina el respaldo unos \(degrees)° hacia atrás"
+        case .straightenBackrest(let degrees):
+            return "Endereza el respaldo unos \(degrees)°"
         }
     }
 
@@ -33,7 +37,7 @@ extension Adjustment {
             return "O inclina un poco el respaldo hacia atrás."
         case .raiseSeat, .lowerSeat:
             return "Si el asiento no tiene altura, revisa la inclinación del respaldo."
-        case .shiftLeft, .shiftRight:
+        case .shiftLeft, .shiftRight, .reclineBackrest, .straightenBackrest:
             return nil
         }
     }
@@ -47,6 +51,8 @@ extension Adjustment {
         case .lowerSeat: return "arrow.down.to.line.circle.fill"
         case .shiftLeft: return "arrow.left.circle.fill"
         case .shiftRight: return "arrow.right.circle.fill"
+        case .reclineBackrest: return "arrow.counterclockwise.circle.fill"
+        case .straightenBackrest: return "arrow.clockwise.circle.fill"
         }
     }
 }

@@ -14,6 +14,14 @@ enum PositionError: Error, Equatable {
     case faceNotFound
     /// No hay lecturas suficientes para guardar una referencia.
     case notEnoughSamples
+    /// La mira no está sobre ninguna superficie reconocida.
+    case noSurface
+    /// Los dos puntos del umbral están demasiado juntos.
+    case referenceTooShort
+    /// La línea entre los dos puntos del umbral está muy inclinada.
+    case referenceNotHorizontal
+    /// Faltan puntos por marcar.
+    case incompleteMeasurement
 }
 
 extension PositionError: LocalizedError {
@@ -29,6 +37,14 @@ extension PositionError: LocalizedError {
             return "No se vio tu cara el tiempo suficiente. Mira hacia el móvil, con buena luz, e inténtalo otra vez."
         case .notEnoughSamples:
             return "Aún no hay una medición estable. Mira hacia el móvil un par de segundos."
+        case .noSurface:
+            return "La mira no está sobre ninguna superficie. Acércate un poco, mueve el móvil despacio y vuelve a apuntar."
+        case .referenceTooShort:
+            return "Los dos puntos del umbral están muy juntos. Marca uno junto al pilar trasero y otro junto al delantero."
+        case .referenceNotHorizontal:
+            return "Esos dos puntos no parecen del umbral. Marca los dos extremos del umbral de la puerta, a la misma altura."
+        case .incompleteMeasurement:
+            return "Faltan puntos por marcar."
         }
     }
 }

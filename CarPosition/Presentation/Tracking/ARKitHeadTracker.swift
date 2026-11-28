@@ -83,10 +83,3 @@ extension ARKitHeadTracker: ARSessionDelegate {
         }
     }
 }
-
-private extension Vector3 {
-    /// Las tres primeras componentes de una columna de una matriz 4×4.
-    init(_ column: simd_float4) {
-        self.init(Double(column.x), Double(column.y), Double(column.z))
-    }
-}

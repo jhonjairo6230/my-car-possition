@@ -1,8 +1,8 @@
 import Foundation
 
-/// Reemplaza la referencia de una posición por una medición nueva
-/// (recalibrar sin crear otra posición).
-struct UpdateReferenceUseCase {
+/// Reemplaza la medición del asiento de una posición (guardar el asiento
+/// actual como el nuevo ideal).
+struct UpdateSeatUseCase {
     private let repository: ProfileRepository
     private let now: () -> Date
 
@@ -13,11 +13,11 @@ struct UpdateReferenceUseCase {
 
     /// - Throws: ``PositionError/profileNotFound`` si ya no existe.
     @discardableResult
-    func execute(id: UUID, reference: PostureMeasurement) throws -> DrivingProfile {
+    func execute(id: UUID, seat: SeatPosition) throws -> DrivingProfile {
         guard var profile = try repository.findProfile(id: id) else {
             throw PositionError.profileNotFound
         }
-        profile.reference = reference
+        profile.seat = seat
         profile.updatedAt = now()
         try repository.save(profile)
         return profile

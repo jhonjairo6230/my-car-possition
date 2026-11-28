@@ -1,8 +1,8 @@
 import XCTest
 @testable import CarPosition
 
-final class PositionEvaluatorTests: XCTestCase {
-    private let evaluator = PositionEvaluator()
+final class HeadEvaluatorTests: XCTestCase {
+    private let evaluator = HeadEvaluator()
     private let reference = PostureMeasurement.cm(depth: 60, height: 10, lateral: 0)
 
     func testTheSamePositionMatches() {
@@ -72,7 +72,7 @@ final class PositionEvaluatorTests: XCTestCase {
     }
 
     func testCentimetersAreAtLeastOne() {
-        XCTAssertEqual(PositionEvaluator.centimeters(0.002), 1)
-        XCTAssertEqual(PositionEvaluator.centimeters(-0.026), 3)
+        XCTAssertEqual(Adjustment.centimeters(0.002), 1)
+        XCTAssertEqual(Adjustment.centimeters(-0.026), 3)
     }
 }

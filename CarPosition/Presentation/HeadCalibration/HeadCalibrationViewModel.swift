@@ -1,8 +1,9 @@
 import Foundation
 import Observation
 
-/// Estado y acciones de la calibración: guardar la posición en la que está
-/// sentado el conductor como una posición nueva.
+/// Estado y acciones de la calibración con la **cámara frontal**: guardar
+/// dónde queda la cabeza respecto al móvil como complemento de una posición
+/// que ya tiene el asiento medido.
 ///
 /// El flujo es: el conductor se acomoda, pulsa **Calibrar**, tiene unos
 /// segundos de cuenta atrás para poner las manos en el volante y mirar al
@@ -10,7 +11,7 @@ import Observation
 /// ``PostureMeasurement``.
 @MainActor
 @Observable
-final class CalibrationViewModel {
+final class HeadCalibrationViewModel {
     enum Phase: Equatable {
         /// Esperando a que el conductor pulse "Calibrar".
         case ready
@@ -22,8 +23,6 @@ final class CalibrationViewModel {
         case saved(DrivingProfile)
     }
 
-    var name = "Mi posición"
-    var notes = ""
     private(set) var phase: Phase = .ready
     /// `true` si en el último fotograma se veía una cara.
     private(set) var isFaceDetected = false
@@ -36,11 +35,11 @@ final class CalibrationViewModel {
 
     var canStart: Bool {
         phase == .ready && isSupported
-            && !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
+    private let profileID: UUID
     private let tracker: HeadTracker
-    private let createProfile: CreateProfileUseCase
+    private let updateHeadReference: UpdateHeadReferenceUseCase
     private let countdownSeconds: Int
     private let samplesNeeded: Int
     /// Fotogramas (con o sin cara) que se esperan antes de rendirse.
@@ -55,16 +54,18 @@ final class CalibrationViewModel {
     @ObservationIgnored private var countdownTask: Task<Void, Never>?
 
     init(
+        profileID: UUID,
         tracker: HeadTracker,
-        createProfile: CreateProfileUseCase,
+        updateHeadReference: UpdateHeadReferenceUseCase,
         countdownSeconds: Int = 3,
         samplesNeeded: Int = 90,
         maxFrames: Int = 600,
         refreshEvery: Int = 6,
         sleep: @escaping (Duration) async throws -> Void = { try await Task.sleep(for: $0) }
     ) {
+        self.profileID = profileID
         self.tracker = tracker
-        self.createProfile = createProfile
+        self.updateHeadReference = updateHeadReference
         self.countdownSeconds = countdownSeconds
         self.samplesNeeded = samplesNeeded
         self.maxFrames = maxFrames
@@ -92,10 +93,6 @@ final class CalibrationViewModel {
     @discardableResult
     func startCapture() -> Task<Void, Never>? {
         guard phase == .ready else { return nil }
-        guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            alert = AlertMessage(error: PositionError.invalidName)
-            return nil
-        }
         let task = Task { [weak self] in
             guard let self else { return }
             await self.runCountdown()
@@ -166,7 +163,7 @@ final class CalibrationViewModel {
         guard let measurement = PostureMeasurement(samples: collected) else { return }
         collected = []
         do {
-            let profile = try createProfile.execute(name: name, notes: notes, reference: measurement)
+            let profile = try updateHeadReference.execute(id: profileID, reference: measurement)
             phase = .saved(profile)
         } catch {
             phase = .ready

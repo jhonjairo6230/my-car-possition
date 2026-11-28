@@ -11,12 +11,7 @@ struct CarPositionApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ProfilesScreen(
-                viewModel: container.profilesViewModel,
-                cameraPreview: container.cameraPreview,
-                makeCalibration: container.makeCalibrationViewModel,
-                makeCheck: container.makeCheckViewModel(profileID:)
-            )
+            ProfilesScreen(viewModel: container.profilesViewModel, screens: container.screens)
         }
     }
 }

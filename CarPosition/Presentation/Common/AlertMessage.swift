@@ -20,6 +20,11 @@ struct AlertMessage: Identifiable {
         )
     }
 
+    static let seatUpdated = AlertMessage(
+        title: "Asiento guardado",
+        message: "A partir de ahora la guía usa el asiento tal como está."
+    )
+
     static let referenceUpdated = AlertMessage(
         title: "Referencia guardada",
         message: "A partir de ahora se compara con la posición en la que estás sentado."
