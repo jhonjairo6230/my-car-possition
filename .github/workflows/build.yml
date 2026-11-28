@@ -2,16 +2,12 @@
 # Explicación paso a paso: docs/compilacion-e-instalacion.md
 name: Compilar IPA
 
+# Solo al fusionar en develop (un merge es un push a develop) y a mano desde
+# Actions → Compilar IPA → Run workflow, eligiendo la rama. Ver ADR 0010.
 on:
   push:
     branches:
-      - main
       - develop
-      - "feature/**"
-      - "release/**"
-      - "hotfix/**"
-      - "backport/**"
-  pull_request:
   workflow_dispatch:
 
 concurrency:

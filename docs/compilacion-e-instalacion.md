@@ -16,7 +16,9 @@ flowchart LR
 
 ## Pasos
 
-1. Haz push a una rama (o lanza **Actions → Compilar IPA → Run workflow**).
+1. Fusiona en `develop` (el workflow corre solo en ese momento) o, para
+   probar una rama antes, lánzalo a mano: **Actions → Compilar IPA → Run
+   workflow** y elige la rama.
 2. Cuando el workflow termine en verde, descarga el artefacto
    **CarPosition-ipa** y descomprímelo: dentro está
    `CarPosition-unsigned.ipa`.

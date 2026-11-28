@@ -43,8 +43,10 @@ Documentación en `docs/`; decisiones en `docs/adr/`.
 
 ## Comprobar un cambio
 
-Push a la rama y mirar el workflow **Compilar IPA**
-(`.github/workflows/build.yml`): pruebas unitarias y de interfaz en un
+El workflow **Compilar IPA** solo corre al fusionar en `develop` o a mano
+(Actions → Compilar IPA → Run workflow, eligiendo la rama); ver
+`docs/adr/0010-ci-solo-en-develop.md`. El workflow
+(`.github/workflows/build.yml`) ejecuta las pruebas unitarias y de interfaz en un
 simulador de iPhone y publica `CarPosition-unsigned.ipa`. ARKit no funciona en
 el simulador: la realidad aumentada y las medidas reales se prueban en el auto.
 

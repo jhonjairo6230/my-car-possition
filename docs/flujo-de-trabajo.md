@@ -14,7 +14,9 @@ Decisión registrada en [ADR 0002](adr/0002-git-flow.md), adoptada de DrawPad.
 Reglas:
 
 - **Nunca** commits directos en `main` ni en `develop`: siempre por pull
-  request, con el workflow **Compilar IPA** en verde.
+  request.
+- El workflow **Compilar IPA** corre al fusionar en `develop` (o a mano
+  desde Actions). Ver [ADR 0010](adr/0010-ci-solo-en-develop.md).
 - **Nunca** un pull request de `develop` a `main`: se pasa por `release/`.
 - Solo esos prefijos, en minúsculas y con guiones (nada de `claude/…`).
 

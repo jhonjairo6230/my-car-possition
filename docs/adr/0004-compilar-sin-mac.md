@@ -38,7 +38,8 @@ cuenta de pago, AltStore, Mac en la nube). Además:
 ## Consecuencias
 
 - Ni Mac ni pagos.
-- Sin compilador local: cada cambio se comprueba con un push.
+- Sin compilador local: un cambio se comprueba al fusionarlo en `develop` o
+  lanzando el workflow a mano ([ADR 0010](0010-ci-solo-en-develop.md)).
 - **ARKit no funciona en el simulador:** las pruebas de interfaz usan una
   cámara simulada (ver [ADR 0007](0007-guia-ar-del-asiento.md)) y la
   medición real solo se valida en el auto.
