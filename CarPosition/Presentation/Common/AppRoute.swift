@@ -14,10 +14,11 @@ enum AppRoute: Hashable {
 /// Presentación no conoce `App`: recibe estas funciones y las vistas de las
 /// dos cámaras ya creadas.
 struct ScreenFactory {
-    /// Vista de la cámara trasera (realidad aumentada del asiento).
-    let seatPreview: CameraPreviewSource
+    /// Vista de la cámara trasera (realidad aumentada del asiento). Es una
+    /// función para que ARKit no se cree hasta abrir una pantalla con cámara.
+    let seatPreview: () -> CameraPreviewSource
     /// Vista de la cámara frontal (cara).
-    let headPreview: CameraPreviewSource
+    let headPreview: () -> CameraPreviewSource
     let makeSeatCalibration: () -> SeatCalibrationViewModel
     let makeProfile: (UUID) -> ProfileViewModel
     let makeSeatCheck: (UUID) -> SeatCheckViewModel

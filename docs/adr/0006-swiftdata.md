@@ -1,6 +1,6 @@
 # 0006. SwiftData como base de datos local
 
-- **Estado:** Aceptada
+- **Estado:** Aceptada; el `fatalError` al no abrir, cambiado por [0012](0012-base-de-datos-sin-cierres.md)
 - **Fecha:** 2026-11-25
 - **Origen:** adoptado de [DrawPad ADR 0007](https://github.com/jhonjairo6230/DrawPad/blob/main/docs/adr/0007-swiftdata.md)
 

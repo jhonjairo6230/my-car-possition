@@ -17,14 +17,57 @@ final class SwiftDataProfileRepository: ProfileRepository {
         context = ModelContext(container)
     }
 
-    /// Crea el contenedor de la base de datos.
-    /// - Parameter inMemory: `true` para una base de datos temporal que no
-    ///   toca el disco (pruebas).
-    static func makeContainer(inMemory: Bool = false) throws -> ModelContainer {
-        try ModelContainer(
+    /// Dónde vive la base de datos (el mismo sitio que usa SwiftData por defecto).
+    static var storeURL: URL {
+        URL.applicationSupportDirectory.appending(path: "default.store")
+    }
+
+    /// Crea el contenedor de una base de datos temporal que no toca el disco
+    /// (pruebas).
+    static func makeContainer(inMemory: Bool) throws -> ModelContainer {
+        guard inMemory else { return try makeContainer(at: storeURL) }
+        return try ModelContainer(
             for: ProfileRecord.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: inMemory)
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
+    }
+
+    /// Crea el contenedor de la base de datos en un archivo.
+    static func makeContainer(at url: URL) throws -> ModelContainer {
+        try? FileManager.default.createDirectory(
+            at: url.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        return try ModelContainer(for: ProfileRecord.self, configurations: ModelConfiguration(url: url))
+    }
+
+    /// Abre la base de datos del disco. Si no se puede (por ejemplo, viene de
+    /// una versión cuyo esquema no se sabe migrar), **aparta sus archivos**
+    /// (no los borra) y crea una vacía.
+    ///
+    /// - Returns: el contenedor y, si hubo que apartar la anterior, el error
+    ///   que lo causó (para avisar al usuario).
+    /// - Throws: si tampoco se puede crear una base de datos vacía.
+    static func openRecovering(at url: URL = storeURL) throws -> (container: ModelContainer, setAsideBecause: Error?) {
+        do {
+            return (try makeContainer(at: url), nil)
+        } catch {
+            setAside(url)
+            return (try makeContainer(at: url), error)
+        }
+    }
+
+    /// Renombra `default.store` (y sus archivos `-shm` y `-wal`) añadiendo
+    /// `.apartado-<fecha>`, para poder recuperarlos a mano si hiciera falta.
+    private static func setAside(_ url: URL) {
+        let fileManager = FileManager.default
+        let stamp = Int(Date().timeIntervalSince1970)
+        for suffix in ["", "-shm", "-wal"] {
+            let source = URL(fileURLWithPath: url.path + suffix)
+            guard fileManager.fileExists(atPath: source.path) else { continue }
+            let destination = URL(fileURLWithPath: url.path + ".apartado-\(stamp)" + suffix)
+            try? fileManager.moveItem(at: source, to: destination)
+        }
     }
 
     func listProfiles() throws -> [DrivingProfile] {
@@ -32,7 +75,7 @@ final class SwiftDataProfileRepository: ProfileRepository {
             let descriptor = FetchDescriptor<ProfileRecord>(
                 sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
             )
-            return try context.fetch(descriptor).map(\.profile)
+            return try context.fetch(descriptor).compactMap(\.profile)
         }
     }
 

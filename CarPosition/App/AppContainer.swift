@@ -15,16 +15,25 @@ final class AppContainer {
 
     private let isUITesting = ProcessInfo.processInfo.arguments.contains(AppContainer.uiTestingArgument)
 
-    private(set) lazy var profilesViewModel = ProfilesViewModel(
-        listProfiles: ListProfilesUseCase(repository: repository),
-        deleteProfile: DeleteProfileUseCase(repository: repository)
-    )
+    /// Aviso que se muestra al arrancar si hubo problemas con la base de datos.
+    private(set) var startupNotice: AlertMessage?
+
+    private(set) lazy var profilesViewModel: ProfilesViewModel = {
+        let viewModel = ProfilesViewModel(
+            listProfiles: ListProfilesUseCase(repository: repository),
+            deleteProfile: DeleteProfileUseCase(repository: repository)
+        )
+        // `repository` ya se abrió arriba: si hubo problemas, se enseñan.
+        viewModel.alert = startupNotice
+        return viewModel
+    }()
 
     /// Todas las pantallas que se abren desde la lista.
     var screens: ScreenFactory {
         ScreenFactory(
-            seatPreview: seatScanner,
-            headPreview: headTracker,
+            // Las cámaras se crean al abrir su primera pantalla, no al arrancar.
+            seatPreview: { [unowned self] in seatScanner },
+            headPreview: { [unowned self] in headTracker },
             makeSeatCalibration: { [unowned self] in makeSeatCalibrationViewModel() },
             makeProfile: { [unowned self] in makeProfileViewModel(profileID: $0) },
             makeSeatCheck: { [unowned self] in makeSeatCheckViewModel(profileID: $0) },
@@ -78,15 +87,45 @@ final class AppContainer {
 
     // MARK: - Implementaciones concretas
 
-    private lazy var repository: ProfileRepository = {
+    private lazy var repository: ProfileRepository = makeRepository()
+
+    /// Abre la base de datos sin cerrar nunca la app
+    /// ([ADR 0012](../../docs/adr/0012-base-de-datos-sin-cierres.md)):
+    ///
+    /// 1. Lo normal: la del disco.
+    /// 2. Si no abre, se aparta y se empieza con una vacía (con aviso).
+    /// 3. Si ni así, una en memoria (con aviso: lo guardado no se conserva).
+    private func makeRepository() -> ProfileRepository {
+        if isUITesting {
+            return SwiftDataProfileRepository(container: Self.inMemoryContainer())
+        }
         do {
-            let container = try SwiftDataProfileRepository.makeContainer(inMemory: isUITesting)
+            let (container, setAsideBecause) = try SwiftDataProfileRepository.openRecovering()
+            if let setAsideBecause {
+                startupNotice = AlertMessage(
+                    title: "Se empezó de cero",
+                    message: "Las posiciones guardadas no se pudieron leer (seguramente eran de una versión anterior de la app). Se apartaron y la lista empieza vacía.\n\nDetalle: \(setAsideBecause)"
+                )
+            }
             return SwiftDataProfileRepository(container: container)
         } catch {
-            // Sin base de datos la app no puede hacer nada útil.
-            fatalError("No se pudo abrir la base de datos: \(error)")
+            startupNotice = AlertMessage(
+                title: "No se pudo abrir la base de datos",
+                message: "La app funciona, pero lo que guardes no se conservará al cerrarla.\n\nDetalle: \(error)"
+            )
+            return SwiftDataProfileRepository(container: Self.inMemoryContainer())
         }
-    }()
+    }
+
+    private static func inMemoryContainer() -> ModelContainer {
+        do {
+            return try SwiftDataProfileRepository.makeContainer(inMemory: true)
+        } catch {
+            // Una base de datos en memoria no depende del disco: si esto falla,
+            // el esquema mismo está mal y ninguna pantalla podría funcionar.
+            fatalError("No se pudo crear la base de datos en memoria: \(error)")
+        }
+    }
 
     /// Cámara trasera con realidad aumentada (guía del asiento).
     private lazy var seatScanner: SeatScanner & CameraPreviewSource = {
