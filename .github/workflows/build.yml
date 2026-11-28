@@ -1,0 +1,90 @@
+# Compila CarPosition (Mi Posición) en un Mac de GitHub y publica un .ipa SIN firmar.
+# Explicación paso a paso: docs/compilacion-e-instalacion.md
+name: Compilar IPA
+
+# Solo al fusionar en develop (un merge es un push a develop) y a mano desde
+# Actions → Compilar IPA → Run workflow, eligiendo la rama. Ver ADR 0010.
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Pruebas e IPA
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Versión de Xcode
+        run: xcodebuild -version
+
+      - name: Instalar XcodeGen
+        run: brew install xcodegen
+
+      - name: Generar CarPosition.xcodeproj
+        run: xcodegen generate
+
+      - name: Pruebas unitarias y de interfaz (simulador de iPhone)
+        run: |
+          UDID=$(xcrun simctl list devices available -j | python3 scripts/pick_iphone_simulator.py)
+          echo "Simulador: $UDID"
+          # Arrancarlo y esperar a que esté listo: si la primera prueba de
+          # interfaz lo pilla arrancando, falla al lanzar la app.
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+          xcodebuild test \
+            -project CarPosition.xcodeproj \
+            -scheme CarPosition \
+            -destination "id=$UDID" \
+            -derivedDataPath build/tests \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Informes de cierre de la app (si las pruebas fallan)
+        if: failure()
+        run: |
+          # Si la app se cerró sola, macOS deja aquí el motivo y la pila de llamadas.
+          shopt -s nullglob
+          for report in ~/Library/Logs/DiagnosticReports/CarPosition*.ips; do
+            echo "::group::$report"
+            head -c 20000 "$report"
+            echo "::endgroup::"
+          done
+
+      - name: Compilar para iPhone (sin firmar)
+        run: |
+          xcodebuild build \
+            -project CarPosition.xcodeproj \
+            -scheme CarPosition \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            -derivedDataPath build/device \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
+
+      - name: Empaquetar .ipa
+        run: |
+          # Un .ipa es un .zip con la app dentro de una carpeta "Payload".
+          mkdir -p build/ipa/Payload
+          cp -R build/device/Build/Products/Release-iphoneos/CarPosition.app build/ipa/Payload/
+          cd build/ipa
+          zip -qry CarPosition-unsigned.ipa Payload
+          ls -lh CarPosition-unsigned.ipa
+
+      - name: Publicar .ipa
+        uses: actions/upload-artifact@v4
+        with:
+          name: CarPosition-ipa
+          path: build/ipa/CarPosition-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,77 @@
+# Definición del proyecto para XcodeGen.
+# El .xcodeproj NO se guarda en git: se genera con `xcodegen generate`
+# (en el CI de GitHub o en un Mac). Ver docs/adr/0004-compilar-sin-mac.md.
+name: CarPosition
+
+options:
+  bundleIdPrefix: com.jhonjairo6230
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+
+targets:
+  CarPosition:
+    type: application
+    platform: iOS
+    sources:
+      - path: CarPosition
+    info:
+      path: CarPosition/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: Mi Posición
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        NSCameraUsageDescription: Mi Posición usa la cámara trasera para medir el asiento con realidad aumentada y, si quieres, la frontal para comprobar dónde queda tu cabeza. Las imágenes no se guardan ni salen del teléfono.
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.jhonjairo6230.carposition
+        TARGETED_DEVICE_FAMILY: "1" # Solo iPhone
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+
+  CarPositionTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: CarPositionTests
+    dependencies:
+      - target: CarPosition
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        TARGETED_DEVICE_FAMILY: "1"
+
+  CarPositionUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: CarPositionUITests
+    dependencies:
+      - target: CarPosition
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        TARGETED_DEVICE_FAMILY: "1"
+
+schemes:
+  CarPosition:
+    build:
+      targets:
+        CarPosition: all
+        CarPositionTests: [test]
+        CarPositionUITests: [test]
+    test:
+      config: Debug
+      targets:
+        - CarPositionTests
+        - CarPositionUITests
