@@ -8,7 +8,11 @@ import SwiftData
 /// una migración automática.
 ///
 /// - Asiento (cámara trasera, en coordenadas del auto): `cushion*`,
-///   `backrestLower*`, `backrestUpper*`.
+///   `backrestLower*`, `backrestUpper*`. Son **opcionales** aunque toda
+///   posición nueva las tiene: la primera versión de la app (solo cámara
+///   frontal) no las tenía, y una columna obligatoria nueva impide a SwiftData
+///   migrar una base de datos ya instalada (la app no llegaba a abrir). Una
+///   fila sin asiento, de aquella versión, se ignora.
 /// - Cabeza (cámara frontal, opcional): `head*`. Si `headSampleCount` es
 ///   `nil`, la posición no tiene referencia de la cabeza.
 ///
@@ -23,15 +27,15 @@ final class ProfileRecord {
     var createdAt: Date
     var updatedAt: Date
 
-    var cushionX: Double
-    var cushionY: Double
-    var cushionZ: Double
-    var backrestLowerX: Double
-    var backrestLowerY: Double
-    var backrestLowerZ: Double
-    var backrestUpperX: Double
-    var backrestUpperY: Double
-    var backrestUpperZ: Double
+    var cushionX: Double?
+    var cushionY: Double?
+    var cushionZ: Double?
+    var backrestLowerX: Double?
+    var backrestLowerY: Double?
+    var backrestLowerZ: Double?
+    var backrestUpperX: Double?
+    var backrestUpperY: Double?
+    var backrestUpperZ: Double?
 
     var headDepth: Double?
     var headHeight: Double?
@@ -94,20 +98,30 @@ final class ProfileRecord {
         headSampleCount = head?.sampleCount
     }
 
-    /// La entidad de dominio que representa esta fila.
-    var profile: DrivingProfile {
-        DrivingProfile(
+    /// La entidad de dominio que representa esta fila, o `nil` si la fila no
+    /// tiene asiento (viene de la primera versión de la app).
+    var profile: DrivingProfile? {
+        guard let seat else { return nil }
+        return DrivingProfile(
             id: id,
             name: name,
             notes: notes,
-            seat: SeatPosition(
-                cushionFront: Vector3(cushionX, cushionY, cushionZ),
-                backrestLower: Vector3(backrestLowerX, backrestLowerY, backrestLowerZ),
-                backrestUpper: Vector3(backrestUpperX, backrestUpperY, backrestUpperZ)
-            ),
+            seat: seat,
             head: headMeasurement,
             createdAt: createdAt,
             updatedAt: updatedAt
+        )
+    }
+
+    private var seat: SeatPosition? {
+        guard let cushionX, let cushionY, let cushionZ,
+              let backrestLowerX, let backrestLowerY, let backrestLowerZ,
+              let backrestUpperX, let backrestUpperY, let backrestUpperZ
+        else { return nil }
+        return SeatPosition(
+            cushionFront: Vector3(cushionX, cushionY, cushionZ),
+            backrestLower: Vector3(backrestLowerX, backrestLowerY, backrestLowerZ),
+            backrestUpper: Vector3(backrestUpperX, backrestUpperY, backrestUpperZ)
         )
     }
 

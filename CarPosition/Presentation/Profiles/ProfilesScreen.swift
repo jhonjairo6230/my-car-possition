@@ -44,15 +44,15 @@ struct ProfilesScreen: View {
     private func destination(_ route: AppRoute) -> some View {
         switch route {
         case .newProfile:
-            SeatCalibrationScreen(viewModel: screens.makeSeatCalibration(), preview: screens.seatPreview)
+            SeatCalibrationScreen(viewModel: screens.makeSeatCalibration(), preview: screens.seatPreview())
         case .profile(let id):
             ProfileScreen(viewModel: screens.makeProfile(id))
         case .seatCheck(let id):
-            SeatCheckScreen(viewModel: screens.makeSeatCheck(id), preview: screens.seatPreview)
+            SeatCheckScreen(viewModel: screens.makeSeatCheck(id), preview: screens.seatPreview())
         case .headCalibration(let id):
-            HeadCalibrationScreen(viewModel: screens.makeHeadCalibration(id), cameraPreview: screens.headPreview)
+            HeadCalibrationScreen(viewModel: screens.makeHeadCalibration(id), cameraPreview: screens.headPreview())
         case .headCheck(let id):
-            HeadCheckScreen(viewModel: screens.makeHeadCheck(id), cameraPreview: screens.headPreview)
+            HeadCheckScreen(viewModel: screens.makeHeadCheck(id), cameraPreview: screens.headPreview())
         }
     }
 

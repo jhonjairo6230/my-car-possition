@@ -27,7 +27,11 @@ Documentación en `docs/`; decisiones en `docs/adr/`.
   `SimulatedSeatScanner` y `SimulatedHeadTracker`.
 - `Data` convierte sus errores a `PositionError`.
 - `ProfileRecord` (`@Model`) no sale de `Data`. Toda propiedad nueva debe ser
-  **opcional** o tener valor por defecto (ver `docs/adr/0006-swiftdata.md`).
+  **opcional** o tener valor por defecto (ver `docs/adr/0006-swiftdata.md`):
+  una obligatoria hizo que la app no abriera en el iPhone (ADR 0012). La
+  prueba `testOpensADatabaseFromTheFirstVersionOfTheApp` lo vigila.
+- La app nunca termina por la base de datos: `openRecovering()` aparta la que
+  no abre y avisa (`docs/adr/0012-base-de-datos-sin-cierres.md`).
 - Distancias en **metros** en el dominio; centímetros solo en la interfaz.
 - En la interfaz se dice **posición**; en el código, `DrivingProfile`.
 - Cada tipo lleva un comentario `///` que explica su papel (el porqué).
