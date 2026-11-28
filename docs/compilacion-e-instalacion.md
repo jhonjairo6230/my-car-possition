@@ -5,10 +5,9 @@ Sideloadly instala desde Windows.
 
 ```mermaid
 flowchart LR
-    A["Código Swift<br/>+ project.yml"] -->|git push| B["GitHub Actions<br/>(Mac en la nube)"]
-    B -->|XcodeGen| C["CarPosition.xcodeproj"]
-    C -->|xcodebuild test| D["Pruebas en<br/>simulador de iPhone"]
-    D -->|xcodebuild build| E["CarPosition.app<br/>sin firmar"]
+    A["Fusionar en develop"] --> B["GitHub Actions<br/>(dos Mac en paralelo)"]
+    B -->|trabajo Pruebas| D["Pruebas en<br/>simulador de iPhone"]
+    B -->|trabajo IPA, ~3 min| E["CarPosition.app<br/>sin firmar"]
     E -->|zip| F["CarPosition-unsigned.ipa<br/>(artefacto)"]
     F -->|descarga| G["PC con Windows<br/>Sideloadly"]
     G -->|firma con tu Apple ID<br/>e instala por USB| H["iPhone"]
@@ -16,10 +15,11 @@ flowchart LR
 
 ## Pasos
 
-1. Fusiona en `develop` (el workflow corre solo en ese momento) o, para
-   probar una rama antes, lánzalo a mano: **Actions → Compilar IPA → Run
-   workflow** y elige la rama.
-2. Cuando el workflow termine en verde, descarga el artefacto
+1. Fusiona el pull request en `develop`: el trabajo **IPA** genera el `.ipa`
+   en unos 3 minutos, sin esperar a las **Pruebas**, que corren en paralelo
+   (y ya corrieron en el pull request). Para probar una rama antes de
+   fusionarla: **Actions → Compilar IPA → Run workflow** y elige la rama.
+2. Cuando termine el trabajo **IPA**, descarga el artefacto
    **CarPosition-ipa** y descomprímelo: dentro está
    `CarPosition-unsigned.ipa`.
 3. Abre **Sideloadly**, conecta el iPhone por USB, arrastra el `.ipa`, pon tu
