@@ -40,9 +40,9 @@ extension PositionError: LocalizedError {
         case .noSurface:
             return "La mira no está sobre ninguna superficie. Acércate un poco, mueve el móvil despacio y vuelve a apuntar."
         case .referenceTooShort:
-            return "Los dos puntos del umbral están muy juntos. Marca uno junto al pilar trasero y otro junto al delantero."
+            return "Los dos puntos de la pisadera están muy juntos. Marca uno en cada extremo: junto al pilar B (atrás) y junto al pilar A (adelante)."
         case .referenceNotHorizontal:
-            return "Esos dos puntos no parecen del umbral. Marca los dos extremos del umbral de la puerta, a la misma altura."
+            return "Esos dos puntos no parecen de la pisadera. Marca los dos extremos de la parte de abajo del marco de la puerta."
         case .incompleteMeasurement:
             return "Faltan puntos por marcar."
         }

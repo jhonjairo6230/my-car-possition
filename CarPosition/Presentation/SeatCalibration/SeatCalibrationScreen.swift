@@ -5,6 +5,7 @@ struct SeatCalibrationScreen: View {
     @State private var viewModel: SeatCalibrationViewModel
     let preview: CameraPreviewSource
 
+    @State private var isShowingSillHelp = false
     @Environment(\.dismiss) private var dismiss
 
     init(viewModel: SeatCalibrationViewModel, preview: CameraPreviewSource) {
@@ -28,6 +29,9 @@ struct SeatCalibrationScreen: View {
         }
         .navigationTitle("Nueva posición")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $isShowingSillHelp) {
+            SillHelpView()
+        }
         .onAppear { viewModel.onAppear() }
         .onDisappear { viewModel.onDisappear() }
         .onChange(of: viewModel.step) { _, step in
@@ -47,6 +51,9 @@ struct SeatCalibrationScreen: View {
                     .font(.headline)
                 Text(landmark.instruction)
                     .font(.subheadline)
+                if landmark.isCarReference {
+                    sillHelpButton
+                }
             case .naming, .saved:
                 Text("Asiento medido").font(.headline)
                 if let angle = viewModel.backrestAngle {
@@ -60,6 +67,17 @@ struct SeatCalibrationScreen: View {
                     .foregroundStyle(.orange)
             }
         }
+    }
+
+    /// Abre la explicación de la pisadera (dónde están los dos puntos).
+    private var sillHelpButton: some View {
+        Button {
+            isShowingSillHelp = true
+        } label: {
+            Label("¿Qué es la pisadera?", systemImage: "questionmark.circle")
+                .font(.footnote.weight(.semibold))
+        }
+        .padding(.top, 2)
     }
 
     @ViewBuilder

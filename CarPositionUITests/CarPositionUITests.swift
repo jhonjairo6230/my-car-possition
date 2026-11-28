@@ -27,7 +27,7 @@ final class CarPositionUITests: XCTestCase {
         app.staticTexts["Asiento de prueba"].tap()
         tap(app.buttons["seatCheck"])
 
-        // Referencia: los dos extremos del umbral.
+        // Referencia: los dos extremos de la pisadera.
         tapMark()
         tapMark()
         assertExists("Cojín en su sitio", timeout: 10)
@@ -52,6 +52,16 @@ final class CarPositionUITests: XCTestCase {
         XCTAssertTrue(check.waitForExistence(timeout: 20))
         check.tap()
         assertExists("Todo en su sitio", timeout: 10)
+    }
+
+    func testTheSillHelpExplainsWhereToAim() {
+        app.buttons["Nueva posición"].firstMatch.tap()
+
+        tap(app.buttons["¿Qué es la pisadera?"])
+        assertExists("¿Qué es la pisadera?")
+        tap(app.buttons["Entendido"])
+
+        XCTAssertTrue(app.buttons["Marcar"].waitForExistence(timeout: 5))
     }
 
     // MARK: - Ayudantes

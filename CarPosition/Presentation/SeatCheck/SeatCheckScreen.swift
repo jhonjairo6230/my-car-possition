@@ -7,6 +7,7 @@ struct SeatCheckScreen: View {
     let preview: CameraPreviewSource
 
     @State private var isConfirmingIdeal = false
+    @State private var isShowingSillHelp = false
 
     init(viewModel: SeatCheckViewModel, preview: CameraPreviewSource) {
         _viewModel = State(wrappedValue: viewModel)
@@ -41,6 +42,9 @@ struct SeatCheckScreen: View {
         } message: {
             Text("La próxima vez la guía buscará esta posición.")
         }
+        .sheet(isPresented: $isShowingSillHelp) {
+            SillHelpView()
+        }
         .onAppear { viewModel.onAppear() }
         .onDisappear { viewModel.onDisappear() }
         .alert(item: $viewModel.alert) { alert in
@@ -55,6 +59,7 @@ struct SeatCheckScreen: View {
             case .reference(let landmark):
                 Text("Referencia · \(landmark.title)").font(.headline)
                 Text(landmark.instruction).font(.subheadline)
+                sillHelpButton
             case .cushion:
                 Text("Adelante/atrás y altura").font(.headline)
                 Text("Apunta al borde delantero del cojín y mueve el asiento hasta que la bola naranja toque la verde.")
@@ -75,6 +80,17 @@ struct SeatCheckScreen: View {
                     .foregroundStyle(.orange)
             }
         }
+    }
+
+    /// Abre la explicación de la pisadera (dónde están los dos puntos).
+    private var sillHelpButton: some View {
+        Button {
+            isShowingSillHelp = true
+        } label: {
+            Label("¿Qué es la pisadera?", systemImage: "questionmark.circle")
+                .font(.footnote.weight(.semibold))
+        }
+        .padding(.top, 2)
     }
 
     @ViewBuilder
